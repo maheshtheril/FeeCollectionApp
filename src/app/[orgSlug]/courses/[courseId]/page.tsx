@@ -82,7 +82,7 @@ export default async function CourseDetailsPage({
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-800">
-                {course.enrollments.map(enrollment => (
+                {course.enrollments.map((enrollment: any) => (
                   <tr key={enrollment.id} className="hover:bg-zinc-800/50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="font-semibold text-white flex items-center gap-2">
