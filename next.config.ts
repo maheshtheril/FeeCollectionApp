@@ -7,8 +7,7 @@ const nextConfig: NextConfig = {
       config.externals.push('@prisma/client', 'prisma');
     }
     return config;
-  },
-  turbopack: {}
+  }
 };
 
 export default nextConfig;
