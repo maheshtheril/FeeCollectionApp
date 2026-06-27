@@ -1,10 +1,47 @@
-import { signIn } from "@/auth"
-import { AuthError } from "next-auth"
-import { redirect } from "next/navigation"
+"use client"
 
-export default async function LoginPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
-  const params = await searchParams
-  const errorMessage = params.error === "credentials" ? "Invalid email or password" : params.error === "default" ? "An error occurred during sign in" : null
+import { signIn } from "next-auth/react"
+import { useSearchParams } from "next/navigation"
+import { useState, Suspense } from "react"
+
+function LoginForm() {
+  const searchParams = useSearchParams()
+  const errorParam = searchParams.get("error")
+  const initialError = errorParam === "credentials" ? "Invalid email or password" : errorParam === "default" ? "An error occurred during sign in" : null
+  
+  const [error, setError] = useState<string | null>(initialError)
+  const [loading, setLoading] = useState(false)
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setLoading(true)
+    setError(null)
+    
+    const formData = new FormData(e.currentTarget)
+    const email = formData.get("email") as string
+    const password = formData.get("password") as string
+    
+    try {
+      const res = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      })
+
+      if (res?.error) {
+        setError("Invalid email or password")
+        setLoading(false)
+      } else if (res?.ok) {
+        window.location.href = "/orgs"
+      } else {
+        setError("An unexpected error occurred")
+        setLoading(false)
+      }
+    } catch (err) {
+      setError("Failed to sign in. Please try again.")
+      setLoading(false)
+    }
+  }
 
   return (
     <div className="relative flex items-center justify-center min-h-screen bg-black text-white overflow-hidden">
@@ -14,7 +51,6 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
       <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none mix-blend-overlay"></div>
 
       <div className="relative z-10 w-full max-w-md p-10 space-y-8 bg-zinc-900/60 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/10 overflow-hidden group">
-        {/* Subtle border glow effect on hover */}
         <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 via-transparent to-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
         
         <div className="text-center space-y-3">
@@ -28,29 +64,13 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
           <p className="text-sm font-medium text-zinc-400">Enter your details to access your account</p>
         </div>
 
-        {errorMessage && (
+        {error && (
           <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm font-medium text-center animate-fade-in">
-            {errorMessage}
+            {error}
           </div>
         )}
 
-        <form
-          action={async (formData) => {
-            "use server"
-            try {
-              await signIn("credentials", Object.fromEntries(formData))
-            } catch (error) {
-              if (error instanceof AuthError) {
-                if (error.type === 'CredentialsSignin') {
-                  redirect("/signin?error=credentials")
-                }
-                redirect("/signin?error=default")
-              }
-              throw error // Re-throw so Next.js can handle redirects
-            }
-          }}
-          className="space-y-5"
-        >
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div className="space-y-1">
             <label className="block text-sm font-semibold text-zinc-300 ml-1" htmlFor="email">Email address</label>
             <div className="relative group/input">
@@ -84,14 +104,17 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
 
           <button
             type="submit"
-            className="relative w-full overflow-hidden px-5 py-3.5 mt-2 text-sm font-bold text-black bg-white rounded-xl group/btn hover:shadow-[0_0_20px_rgba(34,197,94,0.4)] transition-all duration-300"
+            disabled={loading}
+            className="relative w-full overflow-hidden px-5 py-3.5 mt-2 text-sm font-bold text-black bg-white rounded-xl group/btn hover:shadow-[0_0_20px_rgba(34,197,94,0.4)] transition-all duration-300 disabled:opacity-70"
           >
             <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-green-400 via-green-500 to-green-600 opacity-90 transition-opacity duration-300 group-hover/btn:opacity-100"></span>
             <span className="relative flex items-center justify-center gap-2">
-              Sign In
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 transition-transform duration-300 group-hover/btn:translate-x-1" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
-              </svg>
+              {loading ? "Signing in..." : "Sign In"}
+              {!loading && (
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 transition-transform duration-300 group-hover/btn:translate-x-1" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                </svg>
+              )}
             </span>
           </button>
         </form>
@@ -100,3 +123,10 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
   )
 }
 
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-black" />}>
+      <LoginForm />
+    </Suspense>
+  )
+}
