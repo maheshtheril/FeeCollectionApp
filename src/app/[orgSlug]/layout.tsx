@@ -1,0 +1,86 @@
+import { auth } from "@/auth"
+import prisma from "@/lib/prisma"
+import { redirect } from "next/navigation"
+import Link from "next/link"
+import { Users, CreditCard, LayoutDashboard, LogOut } from "lucide-react"
+
+export default async function OrgLayout({
+  children,
+  params,
+}: {
+  children: React.ReactNode
+  params: Promise<{ orgSlug: string }>
+}) {
+  const session = await auth()
+  const { orgSlug } = await params
+
+  if (!session?.user?.id) {
+    redirect("/login")
+  }
+
+  // Verify the user belongs to this organization
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    include: {
+      organizations: {
+        include: {
+          organization: true
+        }
+      }
+    }
+  })
+
+  const currentOrgMembership = user?.organizations.find(
+    (org) => org.organization.slug === orgSlug
+  )
+
+  if (!currentOrgMembership) {
+    // User doesn't belong to this org, or it doesn't exist.
+    redirect("/orgs")
+  }
+
+  const org = currentOrgMembership.organization
+
+  return (
+    <div className="flex h-screen bg-black text-white">
+      {/* Sidebar */}
+      <aside className="w-64 bg-zinc-950 border-r border-zinc-900 flex flex-col">
+        <div className="p-6 border-b border-zinc-900">
+          <h2 className="text-xl font-bold tracking-tight">{org.name}</h2>
+          <span className="text-xs text-zinc-500 uppercase tracking-wider">{currentOrgMembership.role}</span>
+        </div>
+        
+        <nav className="flex-1 p-4 space-y-2">
+          <Link href={`/${org.slug}/dashboard`} className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-zinc-900 transition-colors text-zinc-300 hover:text-white">
+            <LayoutDashboard size={20} /> Dashboard
+          </Link>
+          <Link href={`/${org.slug}/students`} className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-zinc-900 transition-colors text-zinc-300 hover:text-white">
+            <Users size={20} /> Students
+          </Link>
+          <Link href={`/${org.slug}/courses`} className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-zinc-900 transition-colors text-zinc-300 hover:text-white">
+            <LayoutDashboard size={20} /> Courses
+          </Link>
+          <Link href={`/${org.slug}/payments`} className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-zinc-900 transition-colors text-zinc-300 hover:text-white">
+            <CreditCard size={20} /> Payments
+          </Link>
+        </nav>
+
+        <div className="p-4 border-t border-zinc-900">
+          <Link href="/orgs" className="flex items-center justify-between w-full px-4 py-3 text-sm text-zinc-400 hover:text-white transition-colors">
+            <span>Switch Org</span>
+          </Link>
+          <form action="/api/auth/signout" method="POST" className="w-full">
+            <button type="submit" className="flex items-center gap-3 w-full px-4 py-3 text-sm text-red-500 hover:bg-zinc-900 rounded-lg transition-colors">
+              <LogOut size={16} /> Sign Out
+            </button>
+          </form>
+        </div>
+      </aside>
+
+      {/* Main Content */}
+      <main className="flex-1 overflow-y-auto">
+        {children}
+      </main>
+    </div>
+  )
+}
