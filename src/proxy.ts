@@ -6,7 +6,7 @@ const { auth } = NextAuth(authConfig)
 
 export const proxy = auth((req) => {
   const isLoggedIn = !!req.auth
-  const isAuthRoute = req.nextUrl.pathname.startsWith('/login') || req.nextUrl.pathname.startsWith('/register')
+  const isAuthRoute = req.nextUrl.pathname.startsWith('/signin') || req.nextUrl.pathname.startsWith('/register')
   const isApiRoute = req.nextUrl.pathname.startsWith('/api')
   const isPublicRoute = req.nextUrl.pathname === '/'
   
@@ -22,7 +22,7 @@ export const proxy = auth((req) => {
   }
 
   if (!isLoggedIn && !isPublicRoute) {
-    return NextResponse.redirect(new URL('/login', req.url))
+    return NextResponse.redirect(new URL('/signin', req.url))
   }
 
   return NextResponse.next()
@@ -31,3 +31,4 @@ export const proxy = auth((req) => {
 export const config = {
   matcher: ['/((?!.*\\..*|_next).*)', '/', '/(api|trpc)(.*)'],
 }
+

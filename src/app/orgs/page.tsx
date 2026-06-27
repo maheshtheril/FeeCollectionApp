@@ -7,7 +7,7 @@ export default async function OrgsPage() {
   const session = await auth()
   
   if (!session?.user?.id) {
-    redirect("/login")
+    redirect("/signin")
   }
 
   // Fetch the user's organizations
@@ -40,7 +40,7 @@ export default async function OrgsPage() {
             {orgs.map((orgMember) => (
               <Link 
                 key={orgMember.organization.id} 
-                href={`/${orgMember.organization.slug}/dashboard`}
+                href={`/org/${orgMember.organization.slug}/dashboard`}
                 className="p-6 bg-zinc-900 border border-zinc-800 rounded-xl hover:border-green-500 transition-colors group cursor-pointer"
               >
                 <h3 className="text-xl font-semibold group-hover:text-green-500 transition-colors">
@@ -55,3 +55,4 @@ export default async function OrgsPage() {
     </div>
   )
 }
+

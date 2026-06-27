@@ -13,7 +13,7 @@ export default async function CourseDetailsPage({
   const session = await auth()
   const { orgSlug, courseId } = await params
 
-  if (!session?.user?.id) redirect("/login")
+  if (!session?.user?.id) redirect("/signin")
 
   const course = await prisma.course.findUnique({
     where: { id: courseId },
@@ -29,7 +29,7 @@ export default async function CourseDetailsPage({
   })
 
   if (!course || course.organization.slug !== orgSlug) {
-    redirect(`/${orgSlug}/courses`)
+    redirect(`/org/${orgSlug}/courses`)
   }
 
   // Also fetch all students in the org for the enrollment dropdown
@@ -40,7 +40,7 @@ export default async function CourseDetailsPage({
 
   return (
     <div className="p-8 max-w-7xl mx-auto space-y-8">
-      <Link href={`/${orgSlug}/courses`} className="inline-flex items-center gap-2 text-zinc-400 hover:text-white transition-colors">
+      <Link href={`/org/${orgSlug}/courses`} className="inline-flex items-center gap-2 text-zinc-400 hover:text-white transition-colors">
         <ArrowLeft size={16} /> Back to Courses
       </Link>
       

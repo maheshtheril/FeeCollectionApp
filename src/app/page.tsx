@@ -7,6 +7,7 @@ export default async function Home() {
   if (session?.user) {
     redirect("/orgs")
   } else {
-    redirect("/login")
+    redirect("/signin")
   }
 }
+

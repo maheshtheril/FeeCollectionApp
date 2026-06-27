@@ -13,7 +13,7 @@ export default async function TenantDashboard({
   const session = await auth()
   const { orgSlug } = await params
 
-  if (!session?.user?.id) redirect("/login")
+  if (!session?.user?.id) redirect("/signin")
 
   // Find the org by slug to get its ID
   const org = await prisma.organization.findUnique({
@@ -106,7 +106,7 @@ export default async function TenantDashboard({
 
       <h2 className="text-xl font-semibold pt-4">Quick Actions</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Link href={`/${org.slug}/courses`} className="flex items-center justify-between p-6 bg-zinc-900 border border-zinc-800 rounded-2xl hover:border-zinc-700 transition-colors group">
+        <Link href={`/org/${org.slug}/courses`} className="flex items-center justify-between p-6 bg-zinc-900 border border-zinc-800 rounded-2xl hover:border-zinc-700 transition-colors group">
           <div className="flex items-center gap-4">
             <div className="p-3 bg-zinc-950 rounded-xl group-hover:scale-110 transition-transform">
               <Users size={24} className="text-green-500" />
@@ -119,7 +119,7 @@ export default async function TenantDashboard({
           <ChevronRight size={24} className="text-zinc-500 group-hover:text-white transition-colors" />
         </Link>
 
-        <Link href={`/${org.slug}/payments`} className="flex items-center justify-between p-6 bg-zinc-900 border border-zinc-800 rounded-2xl hover:border-zinc-700 transition-colors group">
+        <Link href={`/org/${org.slug}/payments`} className="flex items-center justify-between p-6 bg-zinc-900 border border-zinc-800 rounded-2xl hover:border-zinc-700 transition-colors group">
           <div className="flex items-center gap-4">
             <div className="p-3 bg-zinc-950 rounded-xl group-hover:scale-110 transition-transform">
               <CreditCard size={24} className="text-green-500" />

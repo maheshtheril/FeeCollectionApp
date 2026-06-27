@@ -42,7 +42,7 @@ export async function createCourseAction(orgSlug: string, formData: FormData) {
       }
     })
 
-    revalidatePath(`/${orgSlug}/courses`)
+    revalidatePath(`/org/${orgSlug}/courses`)
     return { success: true }
   } catch (error) {
     console.error("Failed to create course:", error)

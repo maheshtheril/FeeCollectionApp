@@ -2,7 +2,7 @@ import type { NextAuthConfig } from "next-auth"
 
 export const authConfig = {
   pages: {
-    signIn: "/login",
+    signIn: "/signin",
   },
   callbacks: {
     async jwt({ token, user }) {
@@ -23,3 +23,4 @@ export const authConfig = {
   },
   providers: [], // configured in auth.ts
 } satisfies NextAuthConfig
+

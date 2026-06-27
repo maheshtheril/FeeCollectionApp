@@ -92,8 +92,8 @@ export async function addEnrollmentAction(orgSlug: string, courseId: string, for
       })
     }
 
-    revalidatePath(`/${orgSlug}/courses/${courseId}`)
-    revalidatePath(`/${orgSlug}/courses`)
+    revalidatePath(`/org/${orgSlug}/courses/${courseId}`)
+    revalidatePath(`/org/${orgSlug}/courses`)
     return { success: true }
   } catch (error) {
     console.error("Failed to enroll student:", error)

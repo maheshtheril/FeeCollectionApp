@@ -42,9 +42,9 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
             } catch (error) {
               if (error instanceof AuthError) {
                 if (error.type === 'CredentialsSignin') {
-                  redirect("/login?error=credentials")
+                  redirect("/signin?error=credentials")
                 }
-                redirect("/login?error=default")
+                redirect("/signin?error=default")
               }
               throw error // Re-throw so Next.js can handle redirects
             }
@@ -99,3 +99,4 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
     </div>
   )
 }
+

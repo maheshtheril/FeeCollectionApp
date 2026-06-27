@@ -58,7 +58,7 @@ export async function createPaymentRequestAction(orgSlug: string, formData: Form
       }
     })
 
-    revalidatePath(`/${orgSlug}/payments`)
+    revalidatePath(`/org/${orgSlug}/payments`)
     return { success: true }
   } catch (error) {
     console.error("Failed to create invoice:", error)
@@ -99,8 +99,8 @@ export async function markPaymentPaidAction(orgSlug: string, paymentId: string) 
       }
     })
     
-    revalidatePath(`/${orgSlug}/payments`)
-    revalidatePath(`/${orgSlug}/dashboard`)
+    revalidatePath(`/org/${orgSlug}/payments`)
+    revalidatePath(`/org/${orgSlug}/dashboard`)
     return { success: true }
   } catch (error) {
     return { error: "Failed to update invoice" }

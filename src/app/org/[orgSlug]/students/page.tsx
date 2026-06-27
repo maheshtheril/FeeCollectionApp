@@ -12,7 +12,7 @@ export default async function StudentsPage({
   const session = await auth()
   const { orgSlug } = await params
 
-  if (!session?.user?.id) redirect("/login")
+  if (!session?.user?.id) redirect("/signin")
 
   const org = await prisma.organization.findUnique({
     where: { slug: orgSlug }

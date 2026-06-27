@@ -14,7 +14,7 @@ export default async function PaymentsPage({
   const session = await auth()
   const { orgSlug } = await params
 
-  if (!session?.user?.id) redirect("/login")
+  if (!session?.user?.id) redirect("/signin")
 
   const org = await prisma.organization.findUnique({
     where: { slug: orgSlug }
@@ -96,7 +96,7 @@ export default async function PaymentsPage({
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {payment.enrollment ? (
-                        <Link href={`/${org.slug}/courses/${payment.enrollment.course.id}`} className="text-green-500 hover:underline">
+                        <Link href={`/org/${org.slug}/courses/${payment.enrollment.course.id}`} className="text-green-500 hover:underline">
                           {payment.enrollment.course.name}
                         </Link>
                       ) : (

@@ -15,7 +15,7 @@ export default async function OrgLayout({
   const { orgSlug } = await params
 
   if (!session?.user?.id) {
-    redirect("/login")
+    redirect("/signin")
   }
 
   // Verify the user belongs to this organization
@@ -51,16 +51,16 @@ export default async function OrgLayout({
         </div>
         
         <nav className="flex-1 p-4 space-y-2">
-          <Link href={`/${org.slug}/dashboard`} className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-zinc-900 transition-colors text-zinc-300 hover:text-white">
+          <Link href={`/org/${org.slug}/dashboard`} className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-zinc-900 transition-colors text-zinc-300 hover:text-white">
             <LayoutDashboard size={20} /> Dashboard
           </Link>
-          <Link href={`/${org.slug}/students`} className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-zinc-900 transition-colors text-zinc-300 hover:text-white">
+          <Link href={`/org/${org.slug}/students`} className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-zinc-900 transition-colors text-zinc-300 hover:text-white">
             <Users size={20} /> Students
           </Link>
-          <Link href={`/${org.slug}/courses`} className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-zinc-900 transition-colors text-zinc-300 hover:text-white">
+          <Link href={`/org/${org.slug}/courses`} className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-zinc-900 transition-colors text-zinc-300 hover:text-white">
             <LayoutDashboard size={20} /> Courses
           </Link>
-          <Link href={`/${org.slug}/payments`} className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-zinc-900 transition-colors text-zinc-300 hover:text-white">
+          <Link href={`/org/${org.slug}/payments`} className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-zinc-900 transition-colors text-zinc-300 hover:text-white">
             <CreditCard size={20} /> Payments
           </Link>
         </nav>

@@ -38,7 +38,7 @@ export async function createStudentAction(orgSlug: string, formData: FormData) {
       }
     })
 
-    revalidatePath(`/${orgSlug}/students`)
+    revalidatePath(`/org/${orgSlug}/students`)
     return { success: true }
   } catch (error) {
     console.error("Failed to create student:", error)

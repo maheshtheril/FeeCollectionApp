@@ -13,7 +13,7 @@ export default async function CoursesPage({
   const session = await auth()
   const { orgSlug } = await params
 
-  if (!session?.user?.id) redirect("/login")
+  if (!session?.user?.id) redirect("/signin")
 
   const org = await prisma.organization.findUnique({
     where: { slug: orgSlug }
@@ -55,7 +55,7 @@ export default async function CoursesPage({
           {courses.map(course => (
             <Link 
               key={course.id} 
-              href={`/${org.slug}/courses/${course.id}`}
+              href={`/org/${org.slug}/courses/${course.id}`}
               className="group p-6 bg-zinc-900 border border-zinc-800 rounded-2xl hover:border-green-500 transition-all transform hover:-translate-y-1 block"
             >
               <div className="flex justify-between items-start mb-4">
