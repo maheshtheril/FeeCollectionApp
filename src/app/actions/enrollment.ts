@@ -52,7 +52,7 @@ export async function addEnrollmentAction(orgSlug: string, courseId: string, for
     }
 
     const today = new Date()
-    let currentPeriodEnd = null
+    let currentPeriodEnd: Date | null = null
 
     // If recurring billing is enabled, calculate proration and create initial invoice
     if (course.billingInterval !== "ONCE" && course.baseFeeAmount > 0) {

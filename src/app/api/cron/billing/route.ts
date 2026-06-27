@@ -23,7 +23,7 @@ export async function GET(req: Request) {
       include: { course: true, student: true }
     });
 
-    const generatedInvoices = [];
+    const generatedInvoices: any[] = [];
 
     for (const enrollment of activeEnrollments) {
       // Simplified: If it's the anchor day, generate a monthly invoice

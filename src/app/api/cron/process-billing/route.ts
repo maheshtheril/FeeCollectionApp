@@ -31,8 +31,8 @@ export async function GET(request: Request) {
 
     console.log(`[Cron] Found ${enrollmentsToBill.length} enrollments ready for billing.`)
 
-    const invoicesToCreate = []
-    const enrollmentUpdates = []
+    const invoicesToCreate: any[] = []
+    const enrollmentUpdates: any[] = []
 
     for (const enrollment of enrollmentsToBill) {
       // Calculate next period end based on billing interval
