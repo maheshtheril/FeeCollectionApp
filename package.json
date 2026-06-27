@@ -10,13 +10,21 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@auth/prisma-adapter": "^2.11.2",
     "@prisma/client": "^6.0.0",
     "bcryptjs": "^2.4.3",
+    "has-flag": "^5.0.1",
     "lucide-react": "^1.21.0",
     "next": "15.0.0",
+    "next-auth": "^4.24.14",
+    "razorpay": "^2.9.6",
     "react": "19.0.0",
     "react-dom": "19.0.0",
-    "recharts": "^3.9.0"
+    "react-is": "^19.2.7",
+    "recharts": "^3.9.0",
+    "resend": "^6.16.0",
+    "twilio": "^6.0.2",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
