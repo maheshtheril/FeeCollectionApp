@@ -8,6 +8,7 @@ export const createCourseSchema = z.object({
   billingInterval: z.enum(["ONCE", "MONTHLY", "QUARTERLY", "HALF_YEARLY", "YEARLY"]).default("ONCE"),
   baseFeeAmount: z.coerce.number().min(0, "Fee must be 0 or greater").default(0),
   billingAnchorDay: z.coerce.number().min(1).max(31).default(1),
+  teacherId: z.string().optional().or(z.literal("")),
 })
 
 export type CreateCourseInput = z.infer<typeof createCourseSchema>

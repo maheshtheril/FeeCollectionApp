@@ -22,21 +22,42 @@ export default async function TenantDashboard({
 
   if (!org) redirect("/orgs")
 
+  // Check role
+  const membership = await prisma.organizationMember.findUnique({
+    where: {
+      organizationId_userId: {
+        organizationId: org.id,
+        userId: session.user.id
+      }
+    }
+  })
+  if (!membership) redirect("/orgs")
+  const isTeacher = membership.role === "TEACHER"
+
   // Fetch data specific to THIS organization
   const coursesCount = await prisma.course.count({
-    where: { organizationId: org.id }
+    where: { 
+      organizationId: org.id,
+      ...(isTeacher ? { teacherId: session.user.id } : {})
+    }
   })
   
   const studentsCount = await prisma.student.count({
-    where: { organizationId: org.id }
+    where: { 
+      organizationId: org.id,
+      ...(isTeacher ? {
+        enrollments: { some: { course: { teacherId: session.user.id } } }
+      } : {})
+    }
   })
 
   // Aggregate payment data for this org
   const invoices = await prisma.invoice.findMany({
     where: {
-      student: {
-        organizationId: org.id
-      }
+      student: { organizationId: org.id },
+      ...(isTeacher ? {
+        enrollment: { course: { teacherId: session.user.id } }
+      } : {})
     }
   })
 

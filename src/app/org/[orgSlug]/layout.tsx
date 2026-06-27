@@ -63,6 +63,11 @@ export default async function OrgLayout({
           <Link href={`/org/${org.slug}/payments`} className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-zinc-900 transition-colors text-zinc-300 hover:text-white">
             <CreditCard size={20} /> Payments
           </Link>
+          {currentOrgMembership.role === "ADMIN" && (
+            <Link href={`/org/${org.slug}/staff`} className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-zinc-900 transition-colors text-zinc-300 hover:text-white">
+              <Users size={20} /> Staff
+            </Link>
+          )}
         </nav>
 
         <div className="p-4 border-t border-zinc-900">

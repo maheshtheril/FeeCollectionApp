@@ -20,9 +20,28 @@ export default async function StudentsPage({
 
   if (!org) redirect("/orgs")
 
+  // Check role
+  const membership = await prisma.organizationMember.findUnique({
+    where: {
+      organizationId_userId: {
+        organizationId: org.id,
+        userId: session.user.id
+      }
+    }
+  })
+  if (!membership) redirect("/orgs")
+  const isTeacher = membership.role === "TEACHER"
+
   // Fetch students securely
   const students = await prisma.student.findMany({
-    where: { organizationId: org.id },
+    where: { 
+      organizationId: org.id,
+      ...(isTeacher ? {
+        enrollments: {
+          some: { course: { teacherId: session.user.id } }
+        }
+      } : {})
+    },
     include: {
       enrollments: {
         include: { course: true }
@@ -38,7 +57,7 @@ export default async function StudentsPage({
           <h1 className="text-3xl font-bold tracking-tight text-white">Students</h1>
           <p className="text-zinc-400 mt-1">Manage all students across your organization.</p>
         </div>
-        <CreateStudentForm orgSlug={org.slug} />
+        {!isTeacher && <CreateStudentForm orgSlug={org.slug} />}
       </div>
 
       <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden mt-8">

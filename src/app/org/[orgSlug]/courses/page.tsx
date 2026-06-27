@@ -21,9 +21,25 @@ export default async function CoursesPage({
 
   if (!org) redirect("/orgs")
 
+  // Check role
+  const membership = await prisma.organizationMember.findUnique({
+    where: {
+      organizationId_userId: {
+        organizationId: org.id,
+        userId: session.user.id
+      }
+    }
+  })
+  if (!membership) redirect("/orgs")
+
+  const isTeacher = membership.role === "TEACHER"
+
   // Fetch courses securely
   const courses = await prisma.course.findMany({
-    where: { organizationId: org.id },
+    where: { 
+      organizationId: org.id,
+      ...(isTeacher ? { teacherId: session.user.id } : {})
+    },
     include: {
       _count: {
         select: { enrollments: true }
@@ -32,6 +48,16 @@ export default async function CoursesPage({
     orderBy: { createdAt: 'desc' }
   })
 
+  // Fetch teachers for the dropdown if admin
+  let teachers: any[] = []
+  if (!isTeacher) {
+    const staff = await prisma.organizationMember.findMany({
+      where: { organizationId: org.id, role: "TEACHER" },
+      include: { user: true }
+    })
+    teachers = staff.map(s => ({ id: s.user.id, name: s.user.name || s.user.email }))
+  }
+
   return (
     <div className="p-8 max-w-7xl mx-auto space-y-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -39,7 +65,7 @@ export default async function CoursesPage({
           <h1 className="text-3xl font-bold tracking-tight text-white">Courses</h1>
           <p className="text-zinc-400 mt-1">Manage your fee collection courses.</p>
         </div>
-        <CreateCourseForm orgSlug={org.slug} />
+        {!isTeacher && <CreateCourseForm orgSlug={org.slug} teachers={teachers} />}
       </div>
 
       {courses.length === 0 ? (

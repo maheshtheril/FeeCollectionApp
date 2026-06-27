@@ -27,6 +27,7 @@ export async function createCourseAction(orgSlug: string, formData: FormData) {
     billingInterval: formData.get("billingInterval") as string,
     baseFeeAmount: formData.get("baseFeeAmount"),
     billingAnchorDay: formData.get("billingAnchorDay"),
+    teacherId: formData.get("teacherId") as string | undefined,
   }
 
   const validated = createCourseSchema.safeParse(rawData)
@@ -38,6 +39,7 @@ export async function createCourseAction(orgSlug: string, formData: FormData) {
     await prisma.course.create({
       data: {
         ...validated.data,
+        teacherId: validated.data.teacherId || null,
         organizationId: org.id
       }
     })

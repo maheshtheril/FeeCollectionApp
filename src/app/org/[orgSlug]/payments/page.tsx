@@ -22,11 +22,26 @@ export default async function PaymentsPage({
 
   if (!org) redirect("/orgs")
 
+  // Check role
+  const membership = await prisma.organizationMember.findUnique({
+    where: {
+      organizationId_userId: {
+        organizationId: org.id,
+        userId: session.user.id
+      }
+    }
+  })
+  if (!membership) redirect("/orgs")
+  const isTeacher = membership.role === "TEACHER"
+
   // Fetch payments securely
   const payments = await prisma.invoice.findMany({
     where: { 
       enrollment: {
-        course: { organizationId: org.id }
+        course: { 
+          organizationId: org.id,
+          ...(isTeacher ? { teacherId: session.user.id } : {})
+        }
       }
     },
     include: {
@@ -43,7 +58,10 @@ export default async function PaymentsPage({
   // Fetch enrollments to populate the dropdown
   const enrollmentsData = await prisma.enrollment.findMany({
     where: {
-      course: { organizationId: org.id },
+      course: { 
+        organizationId: org.id,
+        ...(isTeacher ? { teacherId: session.user.id } : {})
+      },
       status: "ACTIVE"
     },
     include: { student: true, course: true }
@@ -62,7 +80,7 @@ export default async function PaymentsPage({
           <h1 className="text-3xl font-bold tracking-tight text-white">Payments</h1>
           <p className="text-zinc-400 mt-1">Manage fee requests and track collection.</p>
         </div>
-        <CreatePaymentForm orgSlug={org.slug} enrollments={enrollmentOptions} />
+        {!isTeacher && <CreatePaymentForm orgSlug={org.slug} enrollments={enrollmentOptions} />}
       </div>
 
       <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
