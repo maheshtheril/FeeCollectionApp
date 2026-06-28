@@ -5,6 +5,7 @@ import { CreditCard } from "lucide-react"
 import { CreatePaymentForm } from "./create-payment-form"
 import { MarkPaidButton } from "./mark-paid-button"
 import { SendWhatsAppButton } from "./send-whatsapp-button"
+import { RunBillingEngineButton } from "./run-billing-button"
 import Link from "next/link"
 
 function getRelativeDaysText(dueDate: Date) {
@@ -100,7 +101,12 @@ export default async function PaymentsPage({
           <h1 className="text-3xl font-bold tracking-tight text-white">Payments</h1>
           <p className="text-zinc-400 mt-1">Manage fee requests and track collection.</p>
         </div>
-        {!isTeacher && <CreatePaymentForm orgSlug={org.slug} enrollments={enrollmentOptions} />}
+        {!isTeacher && (
+          <div className="flex items-center gap-3">
+            <RunBillingEngineButton />
+            <CreatePaymentForm orgSlug={org.slug} enrollments={enrollmentOptions} />
+          </div>
+        )}
       </div>
 
       <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
