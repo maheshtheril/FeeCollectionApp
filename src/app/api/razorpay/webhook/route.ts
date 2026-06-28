@@ -29,20 +29,16 @@ export async function POST(req: NextRequest) {
       const orderId = paymentEntity.order_id;
       const paymentId = paymentEntity.id;
 
-      const invoice = await prisma.invoice.findFirst({
+      const updatedInvoices = await prisma.invoice.updateMany({
         where: { razorpayOrderId: orderId },
+        data: { 
+          status: "PAID",
+          paidAt: new Date(),
+          razorpayPaymentId: paymentId
+        },
       });
-
-      if (invoice) {
-        await prisma.invoice.update({
-          where: { id: invoice.id },
-          data: { 
-            status: "PAID",
-            paidAt: new Date(),
-            razorpayPaymentId: paymentId
-          },
-        });
-        
+      
+      if (updatedInvoices.count > 0) {
         // TODO: Trigger Email/WhatsApp Receipt here
       }
     }

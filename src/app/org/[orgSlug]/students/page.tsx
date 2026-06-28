@@ -4,6 +4,7 @@ import { redirect } from "next/navigation"
 import { Users, Phone } from "lucide-react"
 import { CreateStudentForm } from "./create-student-form"
 import { EditStudentForm } from "./edit-student-form"
+import { SendWhatsAppButton } from "../payments/send-whatsapp-button"
 
 export default async function StudentsPage({
   params
@@ -46,6 +47,9 @@ export default async function StudentsPage({
     include: {
       enrollments: {
         include: { course: true }
+      },
+      invoices: {
+        where: { status: "OPEN" }
       }
     },
     orderBy: { createdAt: 'desc' }
@@ -80,6 +84,7 @@ export default async function StudentsPage({
                   <th className="px-6 py-4 font-medium">Phone Number</th>
                   <th className="px-6 py-4 font-medium">Enrolled Courses</th>
                   <th className="px-6 py-4 font-medium">Joined Date</th>
+                  <th className="px-6 py-4 font-medium text-right">Balance</th>
                   {!isTeacher && <th className="px-6 py-4 font-medium text-right">Actions</th>}
                 </tr>
               </thead>
@@ -115,9 +120,29 @@ export default async function StudentsPage({
                     <td className="px-6 py-4 whitespace-nowrap text-zinc-500 text-sm">
                       {new Date(student.createdAt).toLocaleDateString('en-GB')}
                     </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right">
+                      {student.invoices.length > 0 ? (
+                        <span className="font-bold text-red-400">
+                          ₹{student.invoices.reduce((sum, inv) => sum + inv.amount, 0)}
+                        </span>
+                      ) : (
+                        <span className="text-zinc-500 text-sm">₹0</span>
+                      )}
+                    </td>
                     {!isTeacher && (
                       <td className="px-6 py-4 whitespace-nowrap text-right">
-                        <EditStudentForm orgSlug={org.slug} student={student} />
+                        <div className="flex items-center justify-end gap-2">
+                          {student.invoices.length > 0 && (
+                            <SendWhatsAppButton 
+                              studentName={student.name}
+                              courseName="All Courses"
+                              amount={student.invoices.reduce((sum, inv) => sum + inv.amount, 0)}
+                              phone={student.phone}
+                              paymentLink={`/pay/student/${student.id}`}
+                            />
+                          )}
+                          <EditStudentForm orgSlug={org.slug} student={student} />
+                        </div>
                       </td>
                     )}
                   </tr>
