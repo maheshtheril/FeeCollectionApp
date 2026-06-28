@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server"
 import prisma from "@/lib/prisma"
 
+export const dynamic = "force-dynamic"
+
 // This endpoint should be triggered daily at midnight by a Cron scheduler
 export async function GET(request: Request) {
   // Security: In production, verify authorization headers (e.g., from Vercel Cron or a secure secret)
