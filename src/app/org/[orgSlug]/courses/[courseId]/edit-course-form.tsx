@@ -224,16 +224,30 @@ export function EditCourseForm({
                   </div>
 
                   {billingInterval !== 'ONCE' && (
-                    <div>
-                      <label className="block text-sm font-medium text-zinc-400 mb-1">Anchor Day</label>
-                      <input 
-                        type="number" 
-                        name="billingAnchorDay"
-                        defaultValue={course.billingAnchorDay}
-                        min="1"
-                        max="31"
-                        className="w-full px-3 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl focus:ring-2 focus:ring-green-500 focus:outline-none text-white transition-shadow"
-                      />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-zinc-400 mb-1">Anchor Day</label>
+                        <input 
+                          type="number" 
+                          name="billingAnchorDay"
+                          defaultValue={course.billingAnchorDay}
+                          min="1"
+                          max="31"
+                          className="w-full px-3 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl focus:ring-2 focus:ring-green-500 focus:outline-none text-white transition-shadow"
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-zinc-400 mb-1">Grace Period (Days)</label>
+                        <input 
+                          type="number" 
+                          name="gracePeriodDays"
+                          defaultValue={course.gracePeriodDays ?? 7}
+                          min="0"
+                          max="365"
+                          className="w-full px-3 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl focus:ring-2 focus:ring-green-500 focus:outline-none text-white transition-shadow"
+                        />
+                      </div>
                     </div>
                   )}
                 </div>

@@ -5,9 +5,11 @@ export const createCourseSchema = z.object({
   description: z.string().max(200).nullable().optional(),
   upiId: z.string().min(5, "UPI ID must be valid").max(50),
   customMessageTemplate: z.string().max(500).nullable().optional(),
+  billingMode: z.enum(["PRE_PAY", "POST_PAY"]).default("PRE_PAY"),
   billingInterval: z.enum(["ONCE", "MONTHLY", "QUARTERLY", "HALF_YEARLY", "YEARLY"]).default("ONCE"),
   baseFeeAmount: z.coerce.number().min(0, "Fee must be 0 or greater").default(0),
   billingAnchorDay: z.coerce.number().min(1).max(31).default(1),
+  gracePeriodDays: z.coerce.number().min(0).max(365).default(7),
   teacherIds: z.array(z.string()).optional(),
 })
 

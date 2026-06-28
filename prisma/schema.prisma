@@ -109,6 +109,7 @@ model Course {
   billingInterval       String    @default("ONCE") // ONCE, MONTHLY, QUARTERLY, HALF_YEARLY, YEARLY
   baseFeeAmount         Float     @default(0)
   billingAnchorDay      Int       @default(1) // 1-31
+  gracePeriodDays       Int       @default(7)
   
   organization          Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   organizationId        String

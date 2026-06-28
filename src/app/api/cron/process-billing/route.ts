@@ -87,7 +87,7 @@ export async function GET(request: Request) {
           amount: finalAmount,
           description: `${enrollment.course.billingInterval} Subscription (${invoiceStartStr} - ${invoiceEndStr})`,
           status: "OPEN",
-          dueDate: new Date(currentPeriodEndForLoop.getTime() + 7 * 24 * 60 * 60 * 1000), // Due 7 days after period end
+          dueDate: new Date(currentPeriodEndForLoop.getTime() + (enrollment.course.gracePeriodDays ?? 7) * 24 * 60 * 60 * 1000),
         })
 
         currentStartForLoop = new Date(currentPeriodEndForLoop)

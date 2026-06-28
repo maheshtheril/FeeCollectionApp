@@ -24,9 +24,11 @@ export async function createCourseAction(orgSlug: string, formData: FormData) {
     description: formData.get("description") as string,
     upiId: formData.get("upiId") as string,
     customMessageTemplate: formData.get("customMessageTemplate") as string,
+    billingMode: formData.get("billingMode") as string,
     billingInterval: formData.get("billingInterval") as string,
     baseFeeAmount: formData.get("baseFeeAmount"),
     billingAnchorDay: formData.get("billingAnchorDay"),
+    gracePeriodDays: formData.get("gracePeriodDays") || "7",
     teacherIds: formData.getAll("teacherIds") as string[],
   }
 
@@ -78,9 +80,11 @@ export async function updateCourseAction(orgSlug: string, courseId: string, form
     description: formData.get("description") as string,
     upiId: formData.get("upiId") as string,
     customMessageTemplate: formData.get("customMessageTemplate") as string,
+    billingMode: formData.get("billingMode") as string,
     billingInterval: formData.get("billingInterval") as string,
     baseFeeAmount: formData.get("baseFeeAmount"),
     billingAnchorDay: formData.get("billingAnchorDay"),
+    gracePeriodDays: formData.get("gracePeriodDays") || "7",
     teacherIds: formData.getAll("teacherIds") as string[],
   }
 
