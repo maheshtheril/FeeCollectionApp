@@ -103,6 +103,7 @@ model Course {
   description           String?
   upiId                 String
   customMessageTemplate String?
+  isActive              Boolean   @default(true)
   
   // Billing Settings (Enterprise-Grade Product)
   billingMode           String    @default("PRE_PAY") // PRE_PAY, POST_PAY
@@ -128,6 +129,7 @@ model Student {
   parentName      String?          
   phone           String           
   email           String?
+  isActive        Boolean          @default(true)
   
   organization    Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   organizationId  String

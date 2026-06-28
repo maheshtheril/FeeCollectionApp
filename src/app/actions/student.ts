@@ -86,3 +86,55 @@ export async function updateStudentAction(orgSlug: string, studentId: string, fo
     return { error: "Internal Server Error" }
   }
 }
+
+export async function deleteOrDeactivateStudentAction(orgSlug: string, studentId: string) {
+  const session = await auth()
+  if (!session?.user?.id) return { error: "Unauthorized" }
+
+  const org = await prisma.organization.findUnique({
+    where: { slug: orgSlug },
+    include: { members: { where: { userId: session.user.id } } }
+  })
+
+  if (!org || org.members.length === 0) {
+    return { error: "Organization not found or unauthorized" }
+  }
+
+  try {
+    const student = await prisma.student.findUnique({
+      where: { id: studentId, organizationId: org.id },
+      include: { invoices: true }
+    })
+
+    if (!student) {
+      return { error: "Student not found" }
+    }
+
+    if (student.invoices.length === 0) {
+      // Hard delete if no financial history
+      await prisma.student.delete({
+        where: { id: studentId }
+      })
+      revalidatePath(`/org/${orgSlug}/students`)
+      return { success: true, message: "Student deleted successfully." }
+    } else {
+      // Soft delete (Deactivate) if financial history exists
+      await prisma.$transaction([
+        prisma.student.update({
+          where: { id: studentId },
+          data: { isActive: false }
+        }),
+        prisma.enrollment.updateMany({
+          where: { studentId: studentId },
+          data: { status: "CANCELED" }
+        })
+      ])
+      
+      revalidatePath(`/org/${orgSlug}/students`)
+      return { success: true, message: "Student deactivated successfully (past records preserved)." }
+    }
+  } catch (error: any) {
+    console.error("Failed to delete/deactivate student:", error)
+    return { error: "Failed to process request." }
+  }
+}

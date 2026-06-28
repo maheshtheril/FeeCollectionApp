@@ -5,6 +5,7 @@ import { LayoutDashboard, ChevronRight } from "lucide-react"
 import Link from "next/link"
 import { CreateCourseForm } from "./create-course-form"
 import { EditCourseForm } from "./[courseId]/edit-course-form"
+import { DeleteCourseButton } from "./delete-course-button"
 
 export default async function CoursesPage({
   params
@@ -39,13 +40,17 @@ export default async function CoursesPage({
   const courses = await prisma.course.findMany({
     where: { 
       organizationId: org.id,
+      isActive: true,
       ...(isTeacher ? { teachers: { some: { id: session.user.id } } } : {})
     },
     include: {
       _count: {
         select: { enrollments: true }
       },
-      teachers: true
+      teachers: true,
+      enrollments: {
+        include: { invoices: true }
+      }
     },
     orderBy: { createdAt: 'desc' }
   })
@@ -102,7 +107,15 @@ export default async function CoursesPage({
                 </Link>
                 
                 {!isTeacher && (
-                  <EditCourseForm orgSlug={org.slug} course={course} teachers={teachers} />
+                  <div className="flex items-center justify-end gap-2">
+                    <EditCourseForm orgSlug={org.slug} course={course} teachers={teachers} />
+                    <DeleteCourseButton 
+                      orgSlug={org.slug}
+                      courseId={course.id}
+                      courseName={course.name}
+                      hasInvoices={course.enrollments.some(e => e.invoices.length > 0)}
+                    />
+                  </div>
                 )}
               </div>
             </div>

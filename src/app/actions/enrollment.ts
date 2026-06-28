@@ -160,9 +160,56 @@ export async function editEnrollmentAction(orgSlug: string, enrollmentId: string
 
     revalidatePath(`/org/${orgSlug}/courses/${enrollment.courseId}`)
     return { success: true }
-  } catch (error) {
-    console.error("Failed to edit enrollment:", error)
-    return { error: "Internal Server Error" }
+  } catch (error: any) {
+    return { error: error.message || "Failed to update enrollment" }
   }
 }
 
+const cancelEnrollmentSchema = z.object({
+  enrollmentId: z.string().cuid("Invalid enrollment"),
+})
+
+export async function cancelEnrollmentAction(orgSlug: string, courseId: string, formData: FormData) {
+  const session = await auth()
+  if (!session?.user?.id) return { error: "Unauthorized" }
+
+  const course = await prisma.course.findUnique({
+    where: { id: courseId },
+    include: {
+      organization: {
+        include: { members: { where: { userId: session.user.id } } }
+      }
+    }
+  })
+
+  if (!course || course.organization.slug !== orgSlug || course.organization.members.length === 0) {
+    return { error: "Organization or Course not found or unauthorized" }
+  }
+
+  const rawData = {
+    enrollmentId: formData.get("enrollmentId") as string,
+  }
+
+  const validated = cancelEnrollmentSchema.safeParse(rawData)
+  if (!validated.success) {
+    return { error: validated.error.issues[0].message }
+  }
+
+  try {
+    await prisma.enrollment.update({
+      where: {
+        id: validated.data.enrollmentId,
+        courseId: courseId,
+      },
+      data: {
+        status: "CANCELED"
+      }
+    })
+
+    revalidatePath(`/org/${orgSlug}/courses/${courseId}`)
+    revalidatePath(`/org/${orgSlug}/students`)
+    return { success: true }
+  } catch (error: any) {
+    return { error: "Failed to cancel enrollment" }
+  }
+}

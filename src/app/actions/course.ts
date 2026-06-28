@@ -116,3 +116,57 @@ export async function updateCourseAction(orgSlug: string, courseId: string, form
     return { error: "Internal Server Error" }
   }
 }
+
+export async function deleteOrDeactivateCourseAction(orgSlug: string, courseId: string) {
+  const session = await auth()
+  if (!session?.user?.id) return { error: "Unauthorized" }
+
+  const org = await prisma.organization.findUnique({
+    where: { slug: orgSlug },
+    include: { members: { where: { userId: session.user.id } } }
+  })
+
+  if (!org || org.members.length === 0) {
+    return { error: "Organization not found or unauthorized" }
+  }
+
+  try {
+    const course = await prisma.course.findUnique({
+      where: { id: courseId, organizationId: org.id },
+      include: { enrollments: { include: { invoices: true } } }
+    })
+
+    if (!course) {
+      return { error: "Course not found" }
+    }
+
+    const totalInvoices = course.enrollments.reduce((sum, enr) => sum + enr.invoices.length, 0)
+
+    if (totalInvoices === 0) {
+      // Hard delete if no financial history tied to this course
+      await prisma.course.delete({
+        where: { id: courseId }
+      })
+      revalidatePath(`/org/${orgSlug}/courses`)
+      return { success: true, message: "Course deleted successfully." }
+    } else {
+      // Soft delete (Deactivate) if financial history exists
+      await prisma.$transaction([
+        prisma.course.update({
+          where: { id: courseId },
+          data: { isActive: false }
+        }),
+        prisma.enrollment.updateMany({
+          where: { courseId: courseId },
+          data: { status: "CANCELED" }
+        })
+      ])
+      
+      revalidatePath(`/org/${orgSlug}/courses`)
+      return { success: true, message: "Course deactivated successfully (past records preserved)." }
+    }
+  } catch (error: any) {
+    console.error("Failed to delete/deactivate course:", error)
+    return { error: "Failed to process request." }
+  }
+}

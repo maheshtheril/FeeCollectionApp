@@ -5,6 +5,7 @@ import { Users, Phone, ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import { AddEnrollmentForm } from "./add-enrollment-form"
 import { EditEnrollmentForm } from "./edit-enrollment-form"
+import { CancelEnrollmentButton } from "./cancel-enrollment-button"
 import { EditCourseForm } from "./edit-course-form"
 
 export default async function CourseDetailsPage({
@@ -135,11 +136,21 @@ export default async function CourseDetailsPage({
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right">
-                      <EditEnrollmentForm 
-                        orgSlug={orgSlug} 
-                        enrollmentId={enrollment.id} 
-                        currentStartDate={enrollment.createdAt.toISOString()} 
-                      />
+                      <div className="flex items-center justify-end gap-2">
+                        <EditEnrollmentForm 
+                          orgSlug={orgSlug} 
+                          enrollmentId={enrollment.id} 
+                          currentStartDate={enrollment.createdAt.toISOString()} 
+                        />
+                        {enrollment.status === "ACTIVE" && (
+                          <CancelEnrollmentButton
+                            orgSlug={orgSlug}
+                            courseId={courseId}
+                            enrollmentId={enrollment.id}
+                            studentName={enrollment.student.name}
+                          />
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}

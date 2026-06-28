@@ -4,6 +4,7 @@ import { redirect } from "next/navigation"
 import { Users, Phone } from "lucide-react"
 import { CreateStudentForm } from "./create-student-form"
 import { EditStudentForm } from "./edit-student-form"
+import { DeleteStudentButton } from "./delete-student-button"
 import { SendWhatsAppButton } from "../payments/send-whatsapp-button"
 
 export default async function StudentsPage({
@@ -38,6 +39,7 @@ export default async function StudentsPage({
   const students = await prisma.student.findMany({
     where: { 
       organizationId: org.id,
+      isActive: true,
       ...(isTeacher ? {
         enrollments: {
           some: { course: { teachers: { some: { id: session.user.id } } } }
@@ -48,9 +50,7 @@ export default async function StudentsPage({
       enrollments: {
         include: { course: true }
       },
-      invoices: {
-        where: { status: "OPEN" }
-      }
+      invoices: true
     },
     orderBy: { createdAt: 'desc' }
   })
@@ -126,9 +126,9 @@ export default async function StudentsPage({
                       })()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right">
-                      {student.invoices.length > 0 ? (
+                      {student.invoices.filter(i => i.status === "OPEN").length > 0 ? (
                         <span className="font-bold text-red-400">
-                          ₹{student.invoices.reduce((sum, inv) => sum + inv.amount, 0)}
+                          ₹{student.invoices.filter(i => i.status === "OPEN").reduce((sum, inv) => sum + inv.amount, 0)}
                         </span>
                       ) : (
                         <span className="text-zinc-500 text-sm">₹0</span>
@@ -137,16 +137,22 @@ export default async function StudentsPage({
                     {!isTeacher && (
                       <td className="px-6 py-4 whitespace-nowrap text-right">
                         <div className="flex items-center justify-end gap-2">
-                          {student.invoices.length > 0 && (
+                          {student.invoices.filter(i => i.status === "OPEN").length > 0 && (
                             <SendWhatsAppButton 
                               studentName={student.name}
                               courseName="All Courses"
-                              amount={student.invoices.reduce((sum, inv) => sum + inv.amount, 0)}
+                              amount={student.invoices.filter(i => i.status === "OPEN").reduce((sum, inv) => sum + inv.amount, 0)}
                               phone={student.phone}
                               paymentLink={`/pay/student/${student.id}`}
                             />
                           )}
                           <EditStudentForm orgSlug={org.slug} student={student} />
+                          <DeleteStudentButton 
+                            orgSlug={org.slug}
+                            studentId={student.id}
+                            studentName={student.name}
+                            hasInvoices={student.invoices.length > 0}
+                          />
                         </div>
                       </td>
                     )}
