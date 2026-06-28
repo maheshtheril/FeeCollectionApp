@@ -95,7 +95,7 @@ export async function addEnrollmentAction(orgSlug: string, courseId: string, for
           studentId: validated.data.studentId,
           enrollmentId: newEnrollment.id,
           amount: proratedAmount,
-          description: `Initial Prorated Subscription Fee (${daysRemaining} days)`,
+          description: `Initial Prorated Fee (${daysRemaining} days)`,
           status: "OPEN",
           dueDate: new Date(today.getTime() + (course.gracePeriodDays ?? 7) * 24 * 60 * 60 * 1000), 
         }

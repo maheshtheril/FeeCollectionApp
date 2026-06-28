@@ -87,7 +87,7 @@ export async function GET(request: Request) {
           studentId: enrollment.studentId,
           enrollmentId: enrollment.id,
           amount: finalAmount,
-          description: `${enrollment.course.billingInterval} Subscription (${invoiceStartStr} - ${invoiceEndStr})`,
+          description: `${enrollment.course.billingInterval.charAt(0) + enrollment.course.billingInterval.slice(1).toLowerCase()} Fee (${invoiceStartStr} - ${invoiceEndStr})`,
           status: "OPEN",
           dueDate: new Date(currentPeriodEndForLoop.getTime() + (enrollment.course.gracePeriodDays ?? 7) * 24 * 60 * 60 * 1000),
         })
