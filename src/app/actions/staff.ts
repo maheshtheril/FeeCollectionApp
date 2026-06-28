@@ -77,3 +77,66 @@ export async function createStaff(formData: FormData) {
 
   revalidatePath(`/org`)
 }
+
+export async function updateStaffAction(orgId: string, targetUserId: string, formData: FormData) {
+  const session = await auth()
+  if (!session?.user?.id) return { error: "Unauthorized" }
+
+  const currentUserRole = await prisma.organizationMember.findUnique({
+    where: {
+      organizationId_userId: {
+        organizationId: orgId,
+        userId: session.user.id
+      }
+    }
+  })
+
+  if (currentUserRole?.role !== "ADMIN") {
+    return { error: "Only Admins can update staff" }
+  }
+
+  const name = formData.get("name") as string
+  const role = formData.get("role") as string // "TEACHER" or "ADMIN"
+
+  if (!name || !role) {
+    return { error: "Missing required fields" }
+  }
+
+  try {
+    await prisma.$transaction(async (tx) => {
+      // Check if we are demoting an admin
+      if (role === "TEACHER") {
+        const targetMember = await tx.organizationMember.findUnique({
+          where: { organizationId_userId: { organizationId: orgId, userId: targetUserId } }
+        })
+        
+        if (targetMember?.role === "ADMIN") {
+          const adminCount = await tx.organizationMember.count({
+            where: { organizationId: orgId, role: "ADMIN" }
+          })
+          if (adminCount <= 1) {
+            throw new Error("Cannot demote the only remaining Admin.")
+          }
+        }
+      }
+
+      await tx.user.update({
+        where: { id: targetUserId },
+        data: { name }
+      })
+
+      await tx.organizationMember.update({
+        where: {
+          organizationId_userId: { organizationId: orgId, userId: targetUserId }
+        },
+        data: { role }
+      })
+    })
+
+    revalidatePath(`/org`)
+    return { success: true }
+  } catch (error: any) {
+    console.error("Failed to update staff:", error)
+    return { error: error.message || "Internal Server Error" }
+  }
+}

@@ -45,3 +45,44 @@ export async function createStudentAction(orgSlug: string, formData: FormData) {
     return { error: "Internal Server Error" }
   }
 }
+
+export async function updateStudentAction(orgSlug: string, studentId: string, formData: FormData) {
+  const session = await auth()
+  if (!session?.user?.id) return { error: "Unauthorized" }
+
+  const org = await prisma.organization.findUnique({
+    where: { slug: orgSlug },
+    include: { members: { where: { userId: session.user.id } } }
+  })
+
+  if (!org || org.members.length === 0) {
+    return { error: "Organization not found or unauthorized" }
+  }
+
+  const rawData = {
+    name: formData.get("name") as string,
+    phone: formData.get("phone") as string,
+    parentName: formData.get("parentName") as string || undefined,
+  }
+
+  const validated = createStudentSchema.safeParse(rawData)
+  if (!validated.success) {
+    return { error: validated.error.issues[0].message }
+  }
+
+  try {
+    await prisma.student.update({
+      where: { id: studentId, organizationId: org.id },
+      data: {
+        ...validated.data,
+        parentName: validated.data.parentName || null,
+      }
+    })
+
+    revalidatePath(`/org/${orgSlug}/students`)
+    return { success: true }
+  } catch (error) {
+    console.error("Failed to update student:", error)
+    return { error: "Internal Server Error" }
+  }
+}

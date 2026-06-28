@@ -4,6 +4,7 @@ import { redirect } from "next/navigation"
 import { Users, Phone, ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import { AddEnrollmentForm } from "./add-enrollment-form"
+import { EditCourseForm } from "./edit-course-form"
 
 export default async function CourseDetailsPage({
   params
@@ -24,7 +25,8 @@ export default async function CourseDetailsPage({
           student: true
         },
         orderBy: { createdAt: 'desc' }
-      }
+      },
+      teachers: true
     }
   })
 
@@ -38,6 +40,21 @@ export default async function CourseDetailsPage({
     orderBy: { name: 'asc' }
   })
 
+  // Verify role
+  const orgMembership = await prisma.organizationMember.findFirst({
+    where: { organizationId: course.organizationId, userId: session.user.id }
+  })
+  const isAdmin = orgMembership?.role === "ADMIN"
+
+  // Fetch teachers for the edit form if admin
+  const teachers = isAdmin ? await prisma.user.findMany({
+    where: {
+      organizations: {
+        some: { organizationId: course.organizationId, role: "TEACHER" }
+      }
+    }
+  }) : []
+
   return (
     <div className="p-8 max-w-7xl mx-auto space-y-8">
       <Link href={`/org/${orgSlug}/courses`} className="inline-flex items-center gap-2 text-zinc-400 hover:text-white transition-colors">
@@ -46,8 +63,11 @@ export default async function CourseDetailsPage({
       
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-white">{course.name}</h1>
-          <div className="flex gap-4 mt-2">
+          <div className="flex flex-wrap items-center gap-4">
+            <h1 className="text-3xl font-bold tracking-tight text-white">{course.name}</h1>
+            {isAdmin && <EditCourseForm orgSlug={orgSlug} course={course} teachers={teachers} />}
+          </div>
+          <div className="flex flex-wrap gap-4 mt-2">
             <p className="text-zinc-400">UPI ID: <span className="text-white font-mono">{course.upiId}</span></p>
             {course.billingInterval !== "ONCE" && (
               <p className="text-zinc-400">

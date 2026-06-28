@@ -3,6 +3,7 @@ import { auth } from "@/auth"
 import { redirect } from "next/navigation"
 import { Users, Phone } from "lucide-react"
 import { CreateStudentForm } from "./create-student-form"
+import { EditStudentForm } from "./edit-student-form"
 
 export default async function StudentsPage({
   params
@@ -79,6 +80,7 @@ export default async function StudentsPage({
                   <th className="px-6 py-4 font-medium">Phone Number</th>
                   <th className="px-6 py-4 font-medium">Enrolled Courses</th>
                   <th className="px-6 py-4 font-medium">Joined Date</th>
+                  {!isTeacher && <th className="px-6 py-4 font-medium text-right">Actions</th>}
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-800">
@@ -113,6 +115,11 @@ export default async function StudentsPage({
                     <td className="px-6 py-4 whitespace-nowrap text-zinc-500 text-sm">
                       {new Date(student.createdAt).toLocaleDateString()}
                     </td>
+                    {!isTeacher && (
+                      <td className="px-6 py-4 whitespace-nowrap text-right">
+                        <EditStudentForm orgSlug={org.slug} student={student} />
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>

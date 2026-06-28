@@ -2,6 +2,7 @@ import prisma from "@/lib/prisma"
 import { notFound, redirect } from "next/navigation"
 import { auth } from "@/auth"
 import { CreateStaffForm } from "./create-staff-form"
+import { EditStaffForm } from "./edit-staff-form"
 
 export default async function StaffPage({ params }: { params: Promise<{ orgSlug: string }> }) {
   const { orgSlug } = await params
@@ -52,6 +53,7 @@ export default async function StaffPage({ params }: { params: Promise<{ orgSlug:
               <th className="px-6 py-4 font-semibold">Email</th>
               <th className="px-6 py-4 font-semibold">Role</th>
               <th className="px-6 py-4 font-semibold">Joined</th>
+              <th className="px-6 py-4 font-semibold text-right">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-zinc-800">
@@ -67,6 +69,9 @@ export default async function StaffPage({ params }: { params: Promise<{ orgSlug:
                   </span>
                 </td>
                 <td className="px-6 py-4">{new Date(member.createdAt).toLocaleDateString()}</td>
+                <td className="px-6 py-4 text-right">
+                  <EditStaffForm orgId={organization.id} staffMember={member} />
+                </td>
               </tr>
             ))}
             {staffMembers.length === 0 && (
