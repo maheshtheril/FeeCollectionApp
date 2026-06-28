@@ -84,7 +84,7 @@ export default async function TenantDashboard({
       ]; // Fallback empty data for display
 
   return (
-    <div className="p-8 max-w-7xl mx-auto space-y-8 animate-fade-in">
+    <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-8 animate-fade-in">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Overview</h1>

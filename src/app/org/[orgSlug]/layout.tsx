@@ -3,6 +3,7 @@ import prisma from "@/lib/prisma"
 import { redirect } from "next/navigation"
 import Link from "next/link"
 import { Users, CreditCard, LayoutDashboard, LogOut, Settings } from "lucide-react"
+import { MobileNav } from "@/components/mobile-nav"
 
 export default async function OrgLayout({
   children,
@@ -42,9 +43,11 @@ export default async function OrgLayout({
   const org = currentOrgMembership.organization
 
   return (
-    <div className="flex h-screen bg-black text-white">
-      {/* Sidebar */}
-      <aside className="w-64 bg-zinc-950 border-r border-zinc-900 flex flex-col">
+    <div className="flex h-screen bg-black text-white flex-col md:flex-row">
+      <MobileNav org={org} role={currentOrgMembership.role} />
+      
+      {/* Sidebar (Desktop Only) */}
+      <aside className="hidden md:flex w-64 bg-zinc-950 border-r border-zinc-900 flex-col">
         <div className="p-6 border-b border-zinc-900">
           <h2 className="text-xl font-bold tracking-tight">{org.name}</h2>
           <span className="text-xs text-zinc-500 uppercase tracking-wider">{currentOrgMembership.role}</span>

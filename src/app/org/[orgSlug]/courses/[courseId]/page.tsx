@@ -58,7 +58,7 @@ export default async function CourseDetailsPage({
   }) : []
 
   return (
-    <div className="p-8 max-w-7xl mx-auto space-y-8">
+    <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-8">
       <Link href={`/org/${orgSlug}/courses`} className="inline-flex items-center gap-2 text-zinc-400 hover:text-white transition-colors">
         <ArrowLeft size={16} /> Back to Courses
       </Link>

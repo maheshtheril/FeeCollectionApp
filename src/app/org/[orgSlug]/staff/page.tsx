@@ -35,7 +35,7 @@ export default async function StaffPage({ params }: { params: Promise<{ orgSlug:
   })
 
   return (
-    <div className="space-y-6">
+    <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-6">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-white">Staff Management</h1>
@@ -45,7 +45,7 @@ export default async function StaffPage({ params }: { params: Promise<{ orgSlug:
 
       <CreateStaffForm orgId={organization.id} />
 
-      <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
+      <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-x-auto">
         <table className="w-full text-left text-sm text-zinc-300">
           <thead className="bg-zinc-800/50 text-xs uppercase text-zinc-500">
             <tr>
