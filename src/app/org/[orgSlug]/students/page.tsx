@@ -38,7 +38,7 @@ export default async function StudentsPage({
       organizationId: org.id,
       ...(isTeacher ? {
         enrollments: {
-          some: { course: { teacherId: session.user.id } }
+          some: { course: { teachers: { some: { id: session.user.id } } } }
         }
       } : {})
     },

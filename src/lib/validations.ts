@@ -2,13 +2,13 @@ import { z } from "zod"
 
 export const createCourseSchema = z.object({
   name: z.string().min(2, "Course name must be at least 2 characters").max(50),
-  description: z.string().max(200).optional(),
+  description: z.string().max(200).nullable().optional(),
   upiId: z.string().min(5, "UPI ID must be valid").max(50),
-  customMessageTemplate: z.string().max(500).optional(),
+  customMessageTemplate: z.string().max(500).nullable().optional(),
   billingInterval: z.enum(["ONCE", "MONTHLY", "QUARTERLY", "HALF_YEARLY", "YEARLY"]).default("ONCE"),
   baseFeeAmount: z.coerce.number().min(0, "Fee must be 0 or greater").default(0),
   billingAnchorDay: z.coerce.number().min(1).max(31).default(1),
-  teacherId: z.string().optional().or(z.literal("")),
+  teacherIds: z.array(z.string()).optional(),
 })
 
 export type CreateCourseInput = z.infer<typeof createCourseSchema>

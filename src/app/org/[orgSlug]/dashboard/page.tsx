@@ -38,7 +38,7 @@ export default async function TenantDashboard({
   const coursesCount = await prisma.course.count({
     where: { 
       organizationId: org.id,
-      ...(isTeacher ? { teacherId: session.user.id } : {})
+      ...(isTeacher ? { teachers: { some: { id: session.user.id } } } : {})
     }
   })
   
@@ -46,7 +46,7 @@ export default async function TenantDashboard({
     where: { 
       organizationId: org.id,
       ...(isTeacher ? {
-        enrollments: { some: { course: { teacherId: session.user.id } } }
+        enrollments: { some: { course: { teachers: { some: { id: session.user.id } } } } }
       } : {})
     }
   })
@@ -56,7 +56,7 @@ export default async function TenantDashboard({
     where: {
       student: { organizationId: org.id },
       ...(isTeacher ? {
-        enrollment: { course: { teacherId: session.user.id } }
+        enrollment: { course: { teachers: { some: { id: session.user.id } } } }
       } : {})
     }
   })

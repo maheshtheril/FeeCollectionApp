@@ -40,7 +40,7 @@ export default async function PaymentsPage({
       enrollment: {
         course: { 
           organizationId: org.id,
-          ...(isTeacher ? { teacherId: session.user.id } : {})
+          ...(isTeacher ? { teachers: { some: { id: session.user.id } } } : {})
         }
       }
     },
@@ -60,7 +60,7 @@ export default async function PaymentsPage({
     where: {
       course: { 
         organizationId: org.id,
-        ...(isTeacher ? { teacherId: session.user.id } : {})
+        ...(isTeacher ? { teachers: { some: { id: session.user.id } } } : {})
       },
       status: "ACTIVE"
     },

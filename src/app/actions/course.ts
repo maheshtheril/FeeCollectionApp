@@ -27,7 +27,7 @@ export async function createCourseAction(orgSlug: string, formData: FormData) {
     billingInterval: formData.get("billingInterval") as string,
     baseFeeAmount: formData.get("baseFeeAmount"),
     billingAnchorDay: formData.get("billingAnchorDay"),
-    teacherId: formData.get("teacherId") as string | undefined,
+    teacherIds: formData.getAll("teacherIds") as string[],
   }
 
   const validated = createCourseSchema.safeParse(rawData)
@@ -36,11 +36,19 @@ export async function createCourseAction(orgSlug: string, formData: FormData) {
   }
 
   try {
+    const { teacherIds, ...restData } = validated.data;
+
     await prisma.course.create({
       data: {
-        ...validated.data,
-        teacherId: validated.data.teacherId || null,
-        organizationId: org.id
+        ...restData,
+        description: restData.description || null,
+        customMessageTemplate: restData.customMessageTemplate || null,
+        organizationId: org.id,
+        ...(teacherIds && teacherIds.length > 0 ? {
+          teachers: {
+            connect: teacherIds.map((id: string) => ({ id }))
+          }
+        } : {})
       }
     })
 

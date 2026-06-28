@@ -38,7 +38,7 @@ export default async function CoursesPage({
   const courses = await prisma.course.findMany({
     where: { 
       organizationId: org.id,
-      ...(isTeacher ? { teacherId: session.user.id } : {})
+      ...(isTeacher ? { teachers: { some: { id: session.user.id } } } : {})
     },
     include: {
       _count: {

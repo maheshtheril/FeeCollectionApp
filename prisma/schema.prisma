@@ -50,7 +50,7 @@ model User {
   
   // Multi-tenancy relations
   organizations OrganizationMember[]
-  courses       Course[]
+  taughtCourses Course[] @relation("CourseTeachers")
 
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -112,8 +112,7 @@ model Course {
   organization          Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   organizationId        String
 
-  teacher               User?        @relation(fields: [teacherId], references: [id], onDelete: SetNull)
-  teacherId             String?
+  teachers              User[]       @relation("CourseTeachers")
 
   enrollments           Enrollment[]
   

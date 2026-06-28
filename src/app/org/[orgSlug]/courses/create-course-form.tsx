@@ -107,16 +107,22 @@ export function CreateCourseForm({ orgSlug, teachers = [] }: { orgSlug: string, 
 
                   {teachers.length > 0 && (
                     <div>
-                      <label className="block text-sm font-medium text-zinc-400 mb-1">Assign Teacher (Optional)</label>
-                      <select 
-                        name="teacherId"
-                        className="w-full px-3 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl focus:ring-2 focus:ring-green-500 focus:outline-none text-white transition-shadow appearance-none"
-                      >
-                        <option value="">-- No specific teacher --</option>
+                      <label className="block text-sm font-medium text-zinc-400 mb-2">Assign Teachers (Optional)</label>
+                      <div className="space-y-2 max-h-40 overflow-y-auto p-3 bg-zinc-950 border border-zinc-800 rounded-xl">
                         {teachers.map(t => (
-                          <option key={t.id} value={t.id}>{t.name}</option>
+                          <label key={t.id} className="flex items-center gap-3 cursor-pointer hover:bg-zinc-900 p-2 rounded-lg transition-colors">
+                            <input 
+                              type="checkbox" 
+                              name="teacherIds" 
+                              value={t.id} 
+                              className="w-4 h-4 text-green-500 bg-zinc-900 border-zinc-700 rounded focus:ring-green-500 focus:ring-2"
+                            />
+                            <div className="flex flex-col">
+                              <span className="text-sm font-medium text-white">{t.name}</span>
+                            </div>
+                          </label>
                         ))}
-                      </select>
+                      </div>
                     </div>
                   )}
                   
