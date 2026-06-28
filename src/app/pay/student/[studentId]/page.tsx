@@ -26,6 +26,9 @@ export default async function PayStudentPortalPage(props: { params: Promise<{ st
 
   const openInvoices = student.invoices;
   const totalAmount = openInvoices.reduce((sum, inv) => sum + inv.amount, 0);
+  
+  const firstInvoiceWithUpi = openInvoices.find(inv => inv.enrollment?.course?.upiId);
+  const upiId = firstInvoiceWithUpi?.enrollment?.course?.upiId || null;
 
   return (
     <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-4">
@@ -81,6 +84,8 @@ export default async function PayStudentPortalPage(props: { params: Promise<{ st
           <CheckoutClient 
             invoiceIds={openInvoices.map(inv => inv.id)} 
             totalAmount={totalAmount} 
+            upiId={upiId}
+            orgName={student.organization.name}
           />
         )}
       </div>

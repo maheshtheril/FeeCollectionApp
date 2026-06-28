@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Script from "next/script"
 
-export function CheckoutClient({ invoiceIds, totalAmount }: { invoiceIds: string[], totalAmount: number }) {
+export function CheckoutClient({ invoiceIds, totalAmount, upiId, orgName }: { invoiceIds: string[], totalAmount: number, upiId?: string | null, orgName?: string }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
 
@@ -55,6 +55,12 @@ export function CheckoutClient({ invoiceIds, totalAmount }: { invoiceIds: string
     }
   }
 
+  const handleUpiPayment = () => {
+    if (!upiId) return;
+    const upiUri = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(orgName || "Fee Payment")}&am=${totalAmount}&cu=INR&tn=Fee_Payment`;
+    window.location.href = upiUri;
+  }
+
   return (
     <>
       <Script src="https://checkout.razorpay.com/v1/checkout.js" />
@@ -65,12 +71,22 @@ export function CheckoutClient({ invoiceIds, totalAmount }: { invoiceIds: string
         </div>
       )}
       
+      
+      {upiId && (
+        <button 
+          onClick={handleUpiPayment}
+          className="w-full mb-3 py-4 bg-indigo-500 hover:bg-indigo-400 text-white font-bold rounded-xl transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-[0_0_15px_rgba(99,102,241,0.3)] hover:shadow-[0_0_25px_rgba(99,102,241,0.5)]"
+        >
+          Open UPI App (GPay, PhonePe)
+        </button>
+      )}
+
       <button 
         onClick={handlePayment}
         disabled={loading}
         className="w-full py-4 bg-green-500 hover:bg-green-400 text-black font-bold rounded-xl transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:scale-100 shadow-[0_0_15px_rgba(34,197,94,0.3)] hover:shadow-[0_0_25px_rgba(34,197,94,0.5)]"
       >
-        {loading ? "Processing..." : "Pay Total Balance"}
+        {loading ? "Processing..." : "Pay via Card / NetBanking"}
       </button>
       <div className="mt-4 text-center flex items-center justify-center gap-2 text-xs text-zinc-500">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
