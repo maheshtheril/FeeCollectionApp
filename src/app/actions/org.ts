@@ -7,6 +7,10 @@ import { z } from "zod"
 
 const createOrgSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters").max(50),
+  phone: z.string().optional(),
+  email: z.string().optional(),
+  address: z.string().optional(),
+  logoUrl: z.string().optional(),
 })
 
 export async function createOrganizationAction(formData: FormData) {
@@ -14,7 +18,11 @@ export async function createOrganizationAction(formData: FormData) {
   if (!session?.user?.id) return { error: "Unauthorized" }
 
   const validated = createOrgSchema.safeParse({
-    name: formData.get("name")
+    name: formData.get("name"),
+    phone: formData.get("phone") || undefined,
+    email: formData.get("email") || undefined,
+    address: formData.get("address") || undefined,
+    logoUrl: formData.get("logoUrl") || undefined,
   })
 
   if (!validated.success) {
@@ -45,6 +53,10 @@ export async function createOrganizationAction(formData: FormData) {
       data: {
         name: validated.data.name,
         slug: finalSlug,
+        phone: validated.data.phone,
+        email: validated.data.email,
+        address: validated.data.address,
+        logoUrl: validated.data.logoUrl,
         members: {
           create: {
             userId: session.user.id,
