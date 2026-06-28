@@ -7,6 +7,7 @@ import { revalidatePath } from "next/cache"
 
 const addEnrollmentSchema = z.object({
   studentId: z.string().cuid("Invalid student"),
+  startDate: z.string().optional(),
 })
 
 export async function addEnrollmentAction(orgSlug: string, courseId: string, formData: FormData) {
@@ -29,6 +30,7 @@ export async function addEnrollmentAction(orgSlug: string, courseId: string, for
 
   const rawData = {
     studentId: formData.get("studentId") as string,
+    startDate: formData.get("startDate") as string,
   }
 
   const validated = addEnrollmentSchema.safeParse(rawData)
@@ -51,7 +53,14 @@ export async function addEnrollmentAction(orgSlug: string, courseId: string, for
       return { error: "Student is already enrolled in this course" }
     }
 
-    const today = new Date()
+    // Parse the start date if provided, otherwise default to today
+    let today = new Date()
+    if (validated.data.startDate) {
+      const parsedDate = new Date(validated.data.startDate)
+      if (!isNaN(parsedDate.getTime())) {
+        today = parsedDate
+      }
+    }
     let currentPeriodEnd: Date | null = null
 
     // If recurring billing is enabled, calculate proration and create initial invoice
@@ -70,7 +79,8 @@ export async function addEnrollmentAction(orgSlug: string, courseId: string, for
         studentId: validated.data.studentId,
         courseId: course.id,
         currentPeriodStart: today,
-        currentPeriodEnd: currentPeriodEnd
+        currentPeriodEnd: currentPeriodEnd,
+        createdAt: today // also set createdAt so it displays correctly in UI
       }
     })
 
@@ -97,6 +107,52 @@ export async function addEnrollmentAction(orgSlug: string, courseId: string, for
     return { success: true }
   } catch (error) {
     console.error("Failed to enroll student:", error)
+    return { error: "Internal Server Error" }
+  }
+}
+
+export async function editEnrollmentAction(orgSlug: string, enrollmentId: string, formData: FormData) {
+  const session = await auth()
+  if (!session?.user?.id) return { error: "Unauthorized" }
+
+  const startDateStr = formData.get("startDate") as string
+  if (!startDateStr) return { error: "Start date is required" }
+
+  const parsedDate = new Date(startDateStr)
+  if (isNaN(parsedDate.getTime())) return { error: "Invalid date" }
+
+  try {
+    // Verify enrollment belongs to org
+    const enrollment = await prisma.enrollment.findUnique({
+      where: { id: enrollmentId },
+      include: {
+        course: {
+          include: {
+            organization: {
+              include: { members: { where: { userId: session.user.id } } }
+            }
+          }
+        }
+      }
+    })
+
+    if (!enrollment || enrollment.course.organization.slug !== orgSlug || enrollment.course.organization.members.length === 0) {
+      return { error: "Unauthorized or not found" }
+    }
+
+    // Only update the dates, do not regenerate prorated invoices for simplicity
+    await prisma.enrollment.update({
+      where: { id: enrollmentId },
+      data: {
+        currentPeriodStart: parsedDate,
+        createdAt: parsedDate
+      }
+    })
+
+    revalidatePath(`/org/${orgSlug}/courses/${enrollment.courseId}`)
+    return { success: true }
+  } catch (error) {
+    console.error("Failed to edit enrollment:", error)
     return { error: "Internal Server Error" }
   }
 }

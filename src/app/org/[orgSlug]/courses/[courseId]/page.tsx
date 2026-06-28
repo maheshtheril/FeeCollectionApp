@@ -4,6 +4,7 @@ import { redirect } from "next/navigation"
 import { Users, Phone, ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import { AddEnrollmentForm } from "./add-enrollment-form"
+import { EditEnrollmentForm } from "./edit-enrollment-form"
 import { EditCourseForm } from "./edit-course-form"
 
 export default async function CourseDetailsPage({
@@ -134,7 +135,11 @@ export default async function CourseDetailsPage({
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right">
-                      {/* TODO: Add unenroll button */}
+                      <EditEnrollmentForm 
+                        orgSlug={orgSlug} 
+                        enrollmentId={enrollment.id} 
+                        currentStartDate={enrollment.createdAt.toISOString()} 
+                      />
                     </td>
                   </tr>
                 ))}
