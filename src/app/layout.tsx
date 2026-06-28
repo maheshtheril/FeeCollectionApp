@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: "FeeFlow - Fee Collection App",
@@ -17,6 +18,7 @@ export default function RootLayout({
         <div className="min-h-screen bg-black antialiased selection:bg-green-500/30">
           {children}
         </div>
+        <Toaster theme="dark" position="bottom-right" richColors />
       </body>
     </html>
   );

@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { updateStaffAction } from "@/app/actions/staff"
 import { Edit2, X } from "lucide-react"
+import { toast } from "sonner"
 
 export function EditStaffForm({ orgId, staffMember }: { orgId: string, staffMember: any }) {
   const [isOpen, setIsOpen] = useState(false)
@@ -18,7 +19,9 @@ export function EditStaffForm({ orgId, staffMember }: { orgId: string, staffMemb
     setLoading(false)
     if (res?.error) {
       setError(res.error)
+      toast.error(res.error)
     } else if (res?.success) {
+      toast.success("Staff member updated successfully!")
       setIsOpen(false)
     }
   }
@@ -97,7 +100,7 @@ export function EditStaffForm({ orgId, staffMember }: { orgId: string, staffMemb
                 type="submit" 
                 form="edit-staff-form"
                 disabled={loading}
-                className="w-full py-3 bg-green-500 hover:bg-green-400 disabled:opacity-50 text-black font-bold rounded-xl transition-colors"
+                className={`w-full py-3 bg-green-500 hover:bg-green-400 disabled:opacity-50 text-black font-bold rounded-xl transition-colors ${loading ? 'cursor-wait' : ''}`}
               >
                 {loading ? "Saving..." : "Save Changes"}
               </button>

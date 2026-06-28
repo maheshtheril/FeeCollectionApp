@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { updateCourseAction } from "@/app/actions/course"
 import { Settings, X } from "lucide-react"
+import { toast } from "sonner"
 
 export function EditCourseForm({ 
   orgSlug, 
@@ -32,7 +33,9 @@ export function EditCourseForm({
     setLoading(false)
     if (res?.error) {
       setError(res.error)
+      toast.error(res.error)
     } else if (res?.success) {
+      toast.success("Course updated successfully!")
       setIsOpen(false)
       router.refresh()
     }
@@ -225,7 +228,7 @@ export function EditCourseForm({
                 type="submit" 
                 form="edit-course-form"
                 disabled={loading}
-                className="w-full py-3 bg-green-500 hover:bg-green-400 disabled:opacity-50 text-black font-bold rounded-xl transition-colors"
+                className={`w-full py-3 bg-green-500 hover:bg-green-400 disabled:opacity-50 text-black font-bold rounded-xl transition-colors ${loading ? 'cursor-wait' : ''}`}
               >
                 {loading ? "Saving..." : "Save Changes"}
               </button>

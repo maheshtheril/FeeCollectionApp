@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { createStaff } from "@/app/actions/staff"
 import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 
 export function CreateStaffForm({ orgId }: { orgId: string }) {
   const [loading, setLoading] = useState(false)
@@ -19,10 +20,12 @@ export function CreateStaffForm({ orgId }: { orgId: string }) {
       const formData = new FormData(e.currentTarget)
       formData.append("orgId", orgId)
       await createStaff(formData)
+      toast.success("Staff member created successfully!")
       setOpen(false)
       router.refresh()
     } catch (err: any) {
       setError(err.message || "Failed to create staff member")
+      toast.error(err.message || "Failed to create staff member")
     } finally {
       setLoading(false)
     }
@@ -74,7 +77,7 @@ export function CreateStaffForm({ orgId }: { orgId: string }) {
         <button 
           type="submit" 
           disabled={loading}
-          className="w-full px-4 py-2 bg-green-500 text-black font-semibold rounded-lg hover:bg-green-400 disabled:opacity-50"
+          className={`w-full px-4 py-2 bg-green-500 text-black font-semibold rounded-lg hover:bg-green-400 disabled:opacity-50 ${loading ? 'cursor-wait' : ''}`}
         >
           {loading ? "Creating..." : "Create Staff"}
         </button>

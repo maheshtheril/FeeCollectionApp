@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { updateStudentAction } from "@/app/actions/student"
 import { Edit2, X } from "lucide-react"
+import { toast } from "sonner"
 
 export function EditStudentForm({ orgSlug, student }: { orgSlug: string, student: any }) {
   const [isOpen, setIsOpen] = useState(false)
@@ -18,7 +19,9 @@ export function EditStudentForm({ orgSlug, student }: { orgSlug: string, student
     setLoading(false)
     if (res?.error) {
       setError(res.error)
+      toast.error(res.error)
     } else if (res?.success) {
+      toast.success("Student updated successfully!")
       setIsOpen(false)
     }
   }
@@ -97,7 +100,7 @@ export function EditStudentForm({ orgSlug, student }: { orgSlug: string, student
                 type="submit" 
                 form="edit-student-form"
                 disabled={loading}
-                className="w-full py-3 bg-green-500 hover:bg-green-400 disabled:opacity-50 text-black font-bold rounded-xl transition-colors"
+                className={`w-full py-3 bg-green-500 hover:bg-green-400 disabled:opacity-50 text-black font-bold rounded-xl transition-colors ${loading ? 'cursor-wait' : ''}`}
               >
                 {loading ? "Saving..." : "Save Changes"}
               </button>

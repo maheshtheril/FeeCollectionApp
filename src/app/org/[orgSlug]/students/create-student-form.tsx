@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { createStudentAction } from "@/app/actions/student"
 import { Plus, X } from "lucide-react"
+import { toast } from "sonner"
 
 export function CreateStudentForm({ orgSlug }: { orgSlug: string }) {
   const [isOpen, setIsOpen] = useState(false)
@@ -18,7 +19,9 @@ export function CreateStudentForm({ orgSlug }: { orgSlug: string }) {
     setLoading(false)
     if (res?.error) {
       setError(res.error)
+      toast.error(res.error)
     } else if (res?.success) {
+      toast.success("Student created successfully!")
       setIsOpen(false)
     }
   }
@@ -95,7 +98,7 @@ export function CreateStudentForm({ orgSlug }: { orgSlug: string }) {
                 type="submit" 
                 form="create-student-form"
                 disabled={loading}
-                className="w-full py-3 bg-green-500 hover:bg-green-400 disabled:opacity-50 text-black font-bold rounded-xl transition-colors"
+                className={`w-full py-3 bg-green-500 hover:bg-green-400 disabled:opacity-50 text-black font-bold rounded-xl transition-colors ${loading ? 'cursor-wait' : ''}`}
               >
                 {loading ? "Creating..." : "Create Student"}
               </button>
