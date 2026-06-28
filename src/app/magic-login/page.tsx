@@ -11,10 +11,6 @@ export default function MagicLogin() {
       password: "master123",
       redirect: true,
       callbackUrl: "/orgs"
-    }).then(res => {
-      if (res?.error) {
-        setStatus("Error: " + res.error + " - Please try refreshing the page or clearing cookies.")
-      }
     }).catch(err => {
       setStatus("Fatal Error: " + err.message)
     })
