@@ -18,10 +18,27 @@ export function AddEnrollmentForm({
   const [isOpen, setIsOpen] = useState(false)
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
+  
+  // Combobox State
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const [searchTerm, setSearchTerm] = useState("")
+  const [selectedStudentId, setSelectedStudentId] = useState("")
+  
+  const filteredStudents = allStudents.filter(s => 
+    s.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    s.phone.includes(searchTerm)
+  )
+
   const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    
+    if (!selectedStudentId) {
+      setError("Please select a student")
+      return
+    }
+    
     setLoading(true)
     setError("")
     
@@ -78,16 +95,65 @@ export function AddEnrollmentForm({
                       No students available. Please add a student first.
                     </div>
                   ) : (
-                    <select 
-                      name="studentId"
-                      required
-                      className="w-full px-3 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl focus:ring-2 focus:ring-green-500 focus:outline-none text-white transition-shadow appearance-none"
-                    >
-                      <option value="">-- Choose Student --</option>
-                      {allStudents.map(s => (
-                        <option key={s.id} value={s.id}>{s.name} ({s.phone})</option>
-                      ))}
-                    </select>
+                    <div className="relative">
+                      <input type="hidden" name="studentId" value={selectedStudentId} required />
+                      
+                      <div 
+                        className="w-full px-3 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl focus-within:ring-2 focus-within:ring-green-500 transition-shadow flex items-center justify-between cursor-pointer"
+                        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                      >
+                        <span className={`truncate ${selectedStudentId ? 'text-white' : 'text-zinc-500'}`}>
+                          {selectedStudentId 
+                            ? allStudents.find(s => s.id === selectedStudentId)?.name + " (" + allStudents.find(s => s.id === selectedStudentId)?.phone + ")"
+                            : "-- Search & Choose Student --"}
+                        </span>
+                        <svg className={`w-4 h-4 text-zinc-500 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </div>
+
+                      {isDropdownOpen && (
+                        <div className="absolute z-50 w-full mt-2 bg-zinc-900 border border-zinc-700 rounded-xl shadow-2xl overflow-hidden animate-fade-in-up">
+                          <div className="p-2 border-b border-zinc-800">
+                            <input
+                              type="text"
+                              className="w-full bg-zinc-950 border border-zinc-800 text-white text-sm rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-green-500 placeholder-zinc-600"
+                              placeholder="Search by name or phone..."
+                              value={searchTerm}
+                              onChange={(e) => setSearchTerm(e.target.value)}
+                              onClick={(e) => e.stopPropagation()}
+                              autoFocus
+                            />
+                          </div>
+                          <div className="max-h-60 overflow-y-auto no-scrollbar">
+                            {filteredStudents.length === 0 ? (
+                              <div className="p-4 text-center text-zinc-500 text-sm">
+                                No students found.
+                              </div>
+                            ) : (
+                              filteredStudents.map(s => (
+                                <div 
+                                  key={s.id}
+                                  className={`px-4 py-3 cursor-pointer hover:bg-zinc-800 transition-colors text-sm flex items-center justify-between ${selectedStudentId === s.id ? 'bg-green-500/10 text-green-400' : 'text-white'}`}
+                                  onClick={() => {
+                                    setSelectedStudentId(s.id)
+                                    setSearchTerm("")
+                                    setIsDropdownOpen(false)
+                                  }}
+                                >
+                                  <span>{s.name} <span className="text-zinc-500 text-xs ml-1">({s.phone})</span></span>
+                                  {selectedStudentId === s.id && (
+                                    <svg className="w-4 h-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                    </svg>
+                                  )}
+                                </div>
+                              ))
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   )}
                 </div>
 
