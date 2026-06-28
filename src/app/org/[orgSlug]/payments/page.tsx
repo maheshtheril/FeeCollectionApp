@@ -6,6 +6,25 @@ import { CreatePaymentForm } from "./create-payment-form"
 import { MarkPaidButton } from "./mark-paid-button"
 import Link from "next/link"
 
+function getRelativeDaysText(dueDate: Date) {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  
+  const due = new Date(dueDate)
+  due.setHours(0, 0, 0, 0)
+  
+  const diffTime = due.getTime() - today.getTime()
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+  
+  if (diffDays < 0) {
+    return <span className="text-red-500 font-bold bg-red-500/10 px-1.5 py-0.5 rounded-md text-xs ml-1">Overdue by {Math.abs(diffDays)} days</span>
+  } else if (diffDays === 0) {
+    return <span className="text-orange-400 font-bold bg-orange-400/10 px-1.5 py-0.5 rounded-md text-xs ml-1">Due Today</span>
+  } else {
+    return <span className="text-zinc-400 text-xs ml-1">(in {diffDays} days)</span>
+  }
+}
+
 export default async function PaymentsPage({
   params
 }: {
@@ -130,7 +149,10 @@ export default async function PaymentsPage({
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       <div className="text-zinc-400">Gen: {new Date(payment.createdAt).toLocaleDateString('en-GB')}</div>
                       {payment.dueDate && (
-                        <div className="text-red-400 mt-1 font-medium">Due: {new Date(payment.dueDate).toLocaleDateString('en-GB')}</div>
+                        <div className="mt-1 flex items-center flex-wrap gap-1">
+                          <span className="text-red-400 font-medium">Due: {new Date(payment.dueDate).toLocaleDateString('en-GB')}</span>
+                          {payment.status !== "PAID" && getRelativeDaysText(payment.dueDate)}
+                        </div>
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right">
