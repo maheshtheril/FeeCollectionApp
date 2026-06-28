@@ -140,11 +140,20 @@ export async function editEnrollmentAction(orgSlug: string, enrollmentId: string
       return { error: "Unauthorized or not found" }
     }
 
-    // Only update the dates, do not regenerate prorated invoices for simplicity
+    let currentPeriodEnd: Date | null = null
+    if (enrollment.course.billingInterval !== "ONCE" && enrollment.course.baseFeeAmount > 0) {
+      let nextBillingDate = new Date(parsedDate.getFullYear(), parsedDate.getMonth(), enrollment.course.billingAnchorDay)
+      if (parsedDate.getDate() >= enrollment.course.billingAnchorDay) {
+        nextBillingDate.setMonth(nextBillingDate.getMonth() + 1)
+      }
+      currentPeriodEnd = nextBillingDate
+    }
+
     await prisma.enrollment.update({
       where: { id: enrollmentId },
       data: {
         currentPeriodStart: parsedDate,
+        currentPeriodEnd: currentPeriodEnd,
         createdAt: parsedDate
       }
     })
