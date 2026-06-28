@@ -101,7 +101,7 @@ export default async function PaymentsPage({
                   <th className="px-6 py-4 font-medium">Course</th>
                   <th className="px-6 py-4 font-medium">Description</th>
                   <th className="px-6 py-4 font-medium">Amount</th>
-                  <th className="px-6 py-4 font-medium">Date</th>
+                  <th className="px-6 py-4 font-medium">Created / Due</th>
                   <th className="px-6 py-4 font-medium text-right">Action</th>
                 </tr>
               </thead>
@@ -127,8 +127,11 @@ export default async function PaymentsPage({
                     <td className="px-6 py-4 font-bold text-white whitespace-nowrap">
                       ₹{payment.amount}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-zinc-400 text-sm">
-                      {new Date(payment.createdAt).toLocaleDateString('en-GB')}
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      <div className="text-zinc-400">Gen: {new Date(payment.createdAt).toLocaleDateString('en-GB')}</div>
+                      {payment.dueDate && (
+                        <div className="text-red-400 mt-1 font-medium">Due: {new Date(payment.dueDate).toLocaleDateString('en-GB')}</div>
+                      )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right">
                       <MarkPaidButton orgSlug={org.slug} paymentId={payment.id} status={payment.status} />

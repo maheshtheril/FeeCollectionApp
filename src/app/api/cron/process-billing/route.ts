@@ -57,12 +57,16 @@ export async function GET(request: Request) {
             break
         }
 
+        // Format the dates for the description
+        const startStr = currentPeriodEndForLoop.toLocaleDateString('en-GB')
+        const endStr = nextEnd.toLocaleDateString('en-GB')
+
         // Prepare new invoice
         invoicesToCreate.push({
           studentId: enrollment.studentId,
           enrollmentId: enrollment.id,
           amount: enrollment.course.baseFeeAmount,
-          description: `${enrollment.course.billingInterval} Subscription Fee for ${enrollment.course.name} (Auto-generated)`,
+          description: `${enrollment.course.billingInterval} Subscription (${startStr} - ${endStr})`,
           status: "OPEN",
           dueDate: new Date(currentPeriodEndForLoop.getTime() + 7 * 24 * 60 * 60 * 1000), // Due 7 days after period end
         })
