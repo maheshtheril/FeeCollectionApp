@@ -4,16 +4,20 @@ import { useState } from "react"
 import { updateStaffAction } from "@/app/actions/staff"
 import { Edit2, X, Loader2 } from "lucide-react"
 import { toast } from "sonner"
+import { useRouter } from "next/navigation"
 
 export function EditStaffForm({ orgId, staffMember }: { orgId: string, staffMember: any }) {
   const [isOpen, setIsOpen] = useState(false)
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
+  const router = useRouter()
 
-  async function clientAction(formData: FormData) {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
     setLoading(true)
     setError("")
     
+    const formData = new FormData(e.currentTarget)
     const res = await updateStaffAction(orgId, staffMember.user.id, formData)
     
     setLoading(false)
@@ -23,6 +27,7 @@ export function EditStaffForm({ orgId, staffMember }: { orgId: string, staffMemb
     } else if (res?.success) {
       toast.success("Staff member updated successfully!")
       setIsOpen(false)
+      router.refresh()
     }
   }
 
@@ -57,7 +62,7 @@ export function EditStaffForm({ orgId, staffMember }: { orgId: string, staffMemb
                 </div>
               )}
               
-              <form id="edit-staff-form" action={clientAction} className="space-y-4">
+              <form id="edit-staff-form" onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-zinc-400 mb-1">Name</label>
                   <input 

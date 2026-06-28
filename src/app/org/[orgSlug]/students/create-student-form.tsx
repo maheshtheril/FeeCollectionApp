@@ -4,11 +4,13 @@ import { useState } from "react"
 import { createStudentAction } from "@/app/actions/student"
 import { Plus, X, Loader2 } from "lucide-react"
 import { toast } from "sonner"
+import { useRouter } from "next/navigation"
 
 export function CreateStudentForm({ orgSlug }: { orgSlug: string }) {
   const [isOpen, setIsOpen] = useState(false)
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
+  const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -25,6 +27,7 @@ export function CreateStudentForm({ orgSlug }: { orgSlug: string }) {
     } else if (res?.success) {
       toast.success("Student created successfully!")
       setIsOpen(false)
+      router.refresh()
     }
   }
 

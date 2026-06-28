@@ -4,12 +4,14 @@ import { useState } from "react"
 import { createCourseAction } from "@/app/actions/course"
 import { Plus, X, Loader2 } from "lucide-react"
 import { toast } from "sonner"
+import { useRouter } from "next/navigation"
 
 export function CreateCourseForm({ orgSlug, teachers = [] }: { orgSlug: string, teachers?: any[] }) {
   const [isOpen, setIsOpen] = useState(false)
   const [activeTab, setActiveTab] = useState<'basic' | 'billing'>('basic')
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
+  const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -26,6 +28,7 @@ export function CreateCourseForm({ orgSlug, teachers = [] }: { orgSlug: string, 
     } else if (res?.success) {
       toast.success("Course created successfully!")
       setIsOpen(false)
+      router.refresh()
     }
   }
 
