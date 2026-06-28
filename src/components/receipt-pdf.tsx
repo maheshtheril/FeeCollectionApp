@@ -22,6 +22,12 @@ const styles = StyleSheet.create({
   orgName: {
     fontSize: 16,
     color: '#666',
+    fontWeight: 'bold',
+  },
+  orgContact: {
+    fontSize: 10,
+    color: '#999',
+    marginTop: 2,
   },
   section: {
     marginBottom: 20,
@@ -99,6 +105,9 @@ export const ReceiptPDF = ({ data }: { data: any }) => (
             <Image src={data.logoUrl} style={{ width: 80, height: 80, objectFit: 'contain', marginBottom: 10 }} />
           )}
           <Text style={styles.orgName}>{data.orgName}</Text>
+          {data.orgAddress && <Text style={styles.orgContact}>{data.orgAddress}</Text>}
+          {data.orgPhone && <Text style={styles.orgContact}>Phone: {data.orgPhone}</Text>}
+          {data.orgEmail && <Text style={styles.orgContact}>Email: {data.orgEmail}</Text>}
         </View>
       </View>
 

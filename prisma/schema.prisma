@@ -71,6 +71,9 @@ model Organization {
   name      String
   slug      String   @unique // For URL routing e.g., app.com/org/acme
   logoUrl   String?
+  phone     String?
+  email     String?
+  address   String?
   
   members   OrganizationMember[]
   courses   Course[]

@@ -68,6 +68,9 @@ export async function updateOrganizationAction(orgSlug: string, formData: FormDa
 
   const name = formData.get("name") as string
   const logoUrl = formData.get("logoUrl") as string
+  const phone = formData.get("phone") as string
+  const email = formData.get("email") as string
+  const address = formData.get("address") as string
 
   if (!name || name.length < 2) {
     return { error: "Name must be at least 2 characters" }
@@ -84,12 +87,16 @@ export async function updateOrganizationAction(orgSlug: string, formData: FormDa
   }
 
   try {
+    const updateData: any = { name }
+    
+    if (logoUrl) updateData.logoUrl = logoUrl
+    if (phone !== null) updateData.phone = phone
+    if (email !== null) updateData.email = email
+    if (address !== null) updateData.address = address
+
     await prisma.organization.update({
       where: { slug: orgSlug },
-      data: {
-        name,
-        logoUrl: logoUrl || null
-      }
+      data: updateData
     })
 
     revalidatePath(`/org/${orgSlug}/settings`)
