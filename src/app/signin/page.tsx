@@ -1,8 +1,8 @@
 "use client"
 
-import { signIn } from "next-auth/react"
 import { useSearchParams } from "next/navigation"
 import { useState, Suspense } from "react"
+import { loginAction } from "./actions"
 
 function LoginForm() {
   const searchParams = useSearchParams()
@@ -18,26 +18,21 @@ function LoginForm() {
     setError(null)
     
     const formData = new FormData(e.currentTarget)
-    const email = formData.get("email") as string
-    const password = formData.get("password") as string
     
     try {
-      const res = await signIn("credentials", {
-        email,
-        password,
-        redirect: false,
-      })
-
-      if (res?.error) {
-        setError("Invalid email or password")
+      const result = await loginAction(null, formData)
+      if (result?.error) {
+        setError(result.error)
         setLoading(false)
-      } else if (res?.ok) {
-        window.location.href = "/orgs"
       } else {
-        setError("An unexpected error occurred")
-        setLoading(false)
+        window.location.href = "/orgs"
       }
-    } catch (err) {
+    } catch (err: any) {
+      if (err.message === "NEXT_REDIRECT") {
+        // Successful login redirects
+        window.location.href = "/orgs"
+        return
+      }
       setError("Failed to sign in. Please try again.")
       setLoading(false)
     }
