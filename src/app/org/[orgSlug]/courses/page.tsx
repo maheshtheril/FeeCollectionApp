@@ -44,7 +44,8 @@ export default async function CoursesPage({
     include: {
       _count: {
         select: { enrollments: true }
-      }
+      },
+      teachers: true
     },
     orderBy: { createdAt: 'desc' }
   })
