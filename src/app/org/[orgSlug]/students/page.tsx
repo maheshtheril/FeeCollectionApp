@@ -113,7 +113,7 @@ export default async function StudentsPage({
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-zinc-500 text-sm">
-                      {new Date(student.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                      {new Date(student.createdAt).toLocaleDateString('en-GB')}
                     </td>
                     {!isTeacher && (
                       <td className="px-6 py-4 whitespace-nowrap text-right">

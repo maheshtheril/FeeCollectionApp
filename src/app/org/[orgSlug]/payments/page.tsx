@@ -128,7 +128,7 @@ export default async function PaymentsPage({
                       ₹{payment.amount}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-zinc-400 text-sm">
-                      {new Date(payment.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                      {new Date(payment.createdAt).toLocaleDateString('en-GB')}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right">
                       <MarkPaidButton orgSlug={org.slug} paymentId={payment.id} status={payment.status} />
