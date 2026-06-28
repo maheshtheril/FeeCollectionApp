@@ -126,9 +126,9 @@ export default async function StudentsPage({
                       })()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right">
-                      {student.invoices.filter(i => i.status === "OPEN").length > 0 ? (
+                      {student.invoices.filter(i => i.status === "OPEN" || i.status === "OVERDUE").length > 0 ? (
                         <span className="font-bold text-red-400">
-                          ₹{student.invoices.filter(i => i.status === "OPEN").reduce((sum, inv) => sum + inv.amount, 0)}
+                          ₹{student.invoices.filter(i => i.status === "OPEN" || i.status === "OVERDUE").reduce((sum, inv) => sum + inv.amount, 0)}
                         </span>
                       ) : (
                         <span className="text-zinc-500 text-sm">₹0</span>
@@ -137,11 +137,11 @@ export default async function StudentsPage({
                     {!isTeacher && (
                       <td className="px-6 py-4 whitespace-nowrap text-right">
                         <div className="flex items-center justify-end gap-2">
-                          {student.invoices.filter(i => i.status === "OPEN").length > 0 && (
+                          {student.invoices.filter(i => i.status === "OPEN" || i.status === "OVERDUE").length > 0 && (
                             <SendWhatsAppButton 
                               studentName={student.name}
                               courseName="All Courses"
-                              amount={student.invoices.filter(i => i.status === "OPEN").reduce((sum, inv) => sum + inv.amount, 0)}
+                              amount={student.invoices.filter(i => i.status === "OPEN" || i.status === "OVERDUE").reduce((sum, inv) => sum + inv.amount, 0)}
                               phone={student.phone}
                               paymentLink={`/pay/student/${student.id}`}
                             />
