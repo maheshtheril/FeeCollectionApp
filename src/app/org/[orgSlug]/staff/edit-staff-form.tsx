@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { updateStaffAction } from "@/app/actions/staff"
-import { Edit2, X } from "lucide-react"
+import { Edit2, X, Loader2 } from "lucide-react"
 import { toast } from "sonner"
 
 export function EditStaffForm({ orgId, staffMember }: { orgId: string, staffMember: any }) {
@@ -100,8 +100,9 @@ export function EditStaffForm({ orgId, staffMember }: { orgId: string, staffMemb
                 type="submit" 
                 form="edit-staff-form"
                 disabled={loading}
-                className={`w-full py-3 bg-green-500 hover:bg-green-400 disabled:opacity-50 text-black font-bold rounded-xl transition-colors ${loading ? 'cursor-wait' : ''}`}
+                className="w-full flex items-center justify-center gap-2 py-3 bg-green-500 hover:bg-green-400 disabled:opacity-70 text-black font-bold rounded-xl transition-colors cursor-pointer disabled:cursor-not-allowed"
               >
+                {loading && <Loader2 className="animate-spin" size={20} />}
                 {loading ? "Saving..." : "Save Changes"}
               </button>
             </div>

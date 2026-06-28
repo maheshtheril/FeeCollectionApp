@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { createCourseAction } from "@/app/actions/course"
-import { Plus, X } from "lucide-react"
+import { Plus, X, Loader2 } from "lucide-react"
 import { toast } from "sonner"
 
 export function CreateCourseForm({ orgSlug, teachers = [] }: { orgSlug: string, teachers?: any[] }) {
@@ -207,8 +207,9 @@ export function CreateCourseForm({ orgSlug, teachers = [] }: { orgSlug: string, 
                 type="submit" 
                 form="create-course-form"
                 disabled={loading}
-                className={`w-full py-3 bg-green-500 hover:bg-green-400 disabled:opacity-50 text-black font-bold rounded-xl transition-colors ${loading ? 'cursor-wait' : ''}`}
+                className="w-full flex items-center justify-center gap-2 py-3 bg-green-500 hover:bg-green-400 disabled:opacity-70 text-black font-bold rounded-xl transition-colors cursor-pointer disabled:cursor-not-allowed"
               >
+                {loading && <Loader2 className="animate-spin" size={20} />}
                 {loading ? "Creating..." : "Create Course"}
               </button>
             </div>

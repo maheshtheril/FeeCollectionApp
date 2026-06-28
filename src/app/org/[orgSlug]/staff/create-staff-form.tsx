@@ -4,6 +4,7 @@ import { useState } from "react"
 import { createStaff } from "@/app/actions/staff"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
+import { Loader2 } from "lucide-react"
 
 export function CreateStaffForm({ orgId }: { orgId: string }) {
   const [loading, setLoading] = useState(false)
@@ -77,8 +78,9 @@ export function CreateStaffForm({ orgId }: { orgId: string }) {
         <button 
           type="submit" 
           disabled={loading}
-          className={`w-full px-4 py-2 bg-green-500 text-black font-semibold rounded-lg hover:bg-green-400 disabled:opacity-50 ${loading ? 'cursor-wait' : ''}`}
+          className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-green-500 text-black font-semibold rounded-lg hover:bg-green-400 disabled:opacity-70 cursor-pointer disabled:cursor-not-allowed"
         >
+          {loading && <Loader2 className="animate-spin" size={18} />}
           {loading ? "Creating..." : "Create Staff"}
         </button>
       </form>
