@@ -118,7 +118,12 @@ export default async function StudentsPage({
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-zinc-500 text-sm">
-                      {new Date(student.createdAt).toLocaleDateString('en-GB')}
+                      {(() => {
+                        const firstDate = student.enrollments.length > 0
+                          ? new Date(Math.min(...student.enrollments.map(e => new Date(e.createdAt).getTime())))
+                          : new Date(student.createdAt);
+                        return firstDate.toLocaleDateString('en-GB');
+                      })()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right">
                       {student.invoices.length > 0 ? (
