@@ -24,10 +24,12 @@ export function EditCourseForm({
   // Map to get currently assigned teacher IDs
   const assignedTeacherIds = course.teachers?.map((t: any) => t.id) || []
 
-  async function clientAction(formData: FormData) {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
     setLoading(true)
     setError("")
     
+    const formData = new FormData(e.currentTarget)
     const res = await updateCourseAction(orgSlug, course.id, formData)
     
     setLoading(false)
@@ -98,7 +100,7 @@ export function EditCourseForm({
                 </button>
               </div>
 
-              <form id="edit-course-form" action={clientAction}>
+              <form id="edit-course-form" onSubmit={handleSubmit} className="space-y-4">
                 {/* Basic Info Tab */}
                 <div className={activeTab === 'basic' ? 'block space-y-4 animate-fade-in' : 'hidden'}>
                   <div>

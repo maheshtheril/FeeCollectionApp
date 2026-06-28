@@ -11,10 +11,12 @@ export function CreateCourseForm({ orgSlug, teachers = [] }: { orgSlug: string, 
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
 
-  async function clientAction(formData: FormData) {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
     setLoading(true)
     setError("")
     
+    const formData = new FormData(e.currentTarget)
     const res = await createCourseAction(orgSlug, formData)
     
     setLoading(false)
@@ -84,7 +86,7 @@ export function CreateCourseForm({ orgSlug, teachers = [] }: { orgSlug: string, 
                 </button>
               </div>
 
-              <form id="create-course-form" action={clientAction}>
+              <form id="create-course-form" onSubmit={handleSubmit} className="space-y-4">
                 {/* Basic Info Tab */}
                 <div className={activeTab === 'basic' ? 'block space-y-4 animate-fade-in' : 'hidden'}>
                   <div>

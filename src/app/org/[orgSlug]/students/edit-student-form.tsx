@@ -10,10 +10,12 @@ export function EditStudentForm({ orgSlug, student }: { orgSlug: string, student
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
 
-  async function clientAction(formData: FormData) {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
     setLoading(true)
     setError("")
     
+    const formData = new FormData(e.currentTarget)
     const res = await updateStudentAction(orgSlug, student.id, formData)
     
     setLoading(false)
@@ -57,7 +59,7 @@ export function EditStudentForm({ orgSlug, student }: { orgSlug: string, student
                 </div>
               )}
               
-              <form id="edit-student-form" action={clientAction} className="space-y-4">
+              <form id="edit-student-form" onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-zinc-400 mb-1">Student Name</label>
                   <input 
