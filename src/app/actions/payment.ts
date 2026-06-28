@@ -66,14 +66,24 @@ export async function createPaymentRequestAction(orgSlug: string, formData: Form
   }
 }
 
-export async function markPaymentPaidAction(orgSlug: string, paymentId: string) {
+export async function recordManualPaymentAction(orgSlug: string, formData: FormData) {
   const session = await auth()
   if (!session?.user?.id) return { error: "Unauthorized" }
 
-  // Fast verify ownership via a nested query
+  const invoiceId = formData.get("invoiceId") as string
+  const amountStr = formData.get("amount") as string
+  const paymentDateStr = formData.get("paymentDate") as string
+  const paymentMethod = formData.get("paymentMethod") as string
+  const reference = formData.get("reference") as string || null
+  const notes = formData.get("notes") as string || null
+
+  const amount = parseFloat(amountStr)
+  if (isNaN(amount) || amount <= 0) return { error: "Invalid amount" }
+
   const invoice = await prisma.invoice.findUnique({
-    where: { id: paymentId },
+    where: { id: invoiceId },
     include: {
+      payments: true,
       student: {
         include: {
           organization: {
@@ -91,18 +101,37 @@ export async function markPaymentPaidAction(orgSlug: string, paymentId: string) 
   }
 
   try {
-    await prisma.invoice.update({
-      where: { id: paymentId },
-      data: { 
-        status: "PAID",
-        paidAt: new Date()
+    // 1. Create the payment transaction
+    const transaction = await prisma.paymentTransaction.create({
+      data: {
+        invoiceId,
+        amount,
+        paymentDate: paymentDateStr ? new Date(paymentDateStr) : new Date(),
+        paymentMethod,
+        reference,
+        notes
       }
     })
-    
+
+    // 2. Check if the invoice is fully paid
+    const totalPaid = invoice.payments.reduce((sum, p) => sum + p.amount, 0) + amount
+    const isFullyPaid = totalPaid >= invoice.amount
+
+    if (isFullyPaid) {
+      await prisma.invoice.update({
+        where: { id: invoiceId },
+        data: { 
+          status: "PAID",
+          paidAt: transaction.paymentDate
+        }
+      })
+    }
+
     revalidatePath(`/org/${orgSlug}/payments`)
     revalidatePath(`/org/${orgSlug}/dashboard`)
+    revalidatePath(`/org/${orgSlug}/students`)
     return { success: true }
   } catch (error) {
-    return { error: "Failed to update invoice" }
+    return { error: "Failed to record payment" }
   }
 }

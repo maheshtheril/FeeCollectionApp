@@ -6,8 +6,13 @@ import Script from "next/script"
 export function CheckoutClient({ invoiceIds, totalAmount, upiId, orgName }: { invoiceIds: string[], totalAmount: number, upiId?: string | null, orgName?: string }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+  const [amountToPay, setAmountToPay] = useState<number>(totalAmount)
 
   const handlePayment = async () => {
+    if (amountToPay <= 0 || amountToPay > totalAmount) {
+      setError("Please enter a valid amount to pay")
+      return
+    }
     try {
       setLoading(true)
       setError("")
@@ -16,7 +21,7 @@ export function CheckoutClient({ invoiceIds, totalAmount, upiId, orgName }: { in
       const res = await fetch("/api/razorpay/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ invoiceIds })
+        body: JSON.stringify({ invoiceIds, customAmount: amountToPay })
       })
       
       const data = await res.json()
@@ -26,7 +31,7 @@ export function CheckoutClient({ invoiceIds, totalAmount, upiId, orgName }: { in
       // 2. Initialize Razorpay Checkout
       const options = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "dummy_key", 
-        amount: Math.round(totalAmount * 100),
+        amount: Math.round(amountToPay * 100),
         currency: "INR",
         name: "FeeFlow Payment",
         description: `Consolidated Payment for ${invoiceIds.length} Invoice(s)`,
@@ -56,8 +61,12 @@ export function CheckoutClient({ invoiceIds, totalAmount, upiId, orgName }: { in
   }
 
   const handleUpiPayment = () => {
+    if (amountToPay <= 0 || amountToPay > totalAmount) {
+      setError("Please enter a valid amount to pay")
+      return
+    }
     if (!upiId) return;
-    const upiUri = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(orgName || "Fee Payment")}&am=${totalAmount}&cu=INR&tn=Fee_Payment`;
+    const upiUri = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(orgName || "Fee Payment")}&am=${amountToPay}&cu=INR&tn=Fee_Payment`;
     window.location.href = upiUri;
   }
 
@@ -70,6 +79,23 @@ export function CheckoutClient({ invoiceIds, totalAmount, upiId, orgName }: { in
           {error}
         </div>
       )}
+
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-zinc-400 mb-1">Amount to Pay Today (₹)</label>
+        <input 
+          type="number" 
+          value={amountToPay}
+          onChange={(e) => setAmountToPay(Number(e.target.value))}
+          max={totalAmount}
+          min={1}
+          className="w-full bg-zinc-950 border border-zinc-800 rounded-xl py-3 px-4 text-white font-bold text-lg focus:outline-none focus:ring-2 focus:ring-green-500/50" 
+        />
+        {amountToPay < totalAmount && (
+          <p className="text-xs text-orange-400 mt-2 font-medium bg-orange-400/10 p-2 rounded">
+            You are making a partial payment. The remaining balance will still be due.
+          </p>
+        )}
+      </div>
       
       
       {upiId && (

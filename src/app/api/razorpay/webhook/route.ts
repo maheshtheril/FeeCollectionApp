@@ -28,19 +28,56 @@ export async function POST(req: NextRequest) {
       const paymentEntity = event.payload.payment.entity;
       const orderId = paymentEntity.order_id;
       const paymentId = paymentEntity.id;
+      let remainingAmountToDistribute = paymentEntity.amount / 100; // Convert from paise
 
-      const updatedInvoices = await prisma.invoice.updateMany({
+      // Find all invoices associated with this order, ordered by oldest first
+      const invoices = await prisma.invoice.findMany({
         where: { razorpayOrderId: orderId },
-        data: { 
-          status: "PAID",
-          paidAt: new Date(),
-          razorpayPaymentId: paymentId
-        },
+        include: { payments: true },
+        orderBy: [
+          { dueDate: 'asc' },
+          { createdAt: 'asc' }
+        ]
       });
-      
-      if (updatedInvoices.count > 0) {
-        // TODO: Trigger Email/WhatsApp Receipt here
+
+      for (const invoice of invoices) {
+        if (remainingAmountToDistribute <= 0) break;
+
+        const previouslyPaid = invoice.payments.reduce((sum, p) => sum + p.amount, 0);
+        const invoiceRemainingBalance = Math.max(0, invoice.amount - previouslyPaid);
+
+        if (invoiceRemainingBalance <= 0) continue;
+
+        // How much of this invoice can we pay off?
+        const amountToPayForThisInvoice = Math.min(invoiceRemainingBalance, remainingAmountToDistribute);
+
+        // Record the transaction
+        const transaction = await prisma.paymentTransaction.create({
+          data: {
+            invoiceId: invoice.id,
+            amount: amountToPayForThisInvoice,
+            paymentMethod: "RAZORPAY",
+            reference: paymentId,
+            notes: `Razorpay Order: ${orderId}`
+          }
+        });
+
+        // Deduct from our running total
+        remainingAmountToDistribute -= amountToPayForThisInvoice;
+
+        // Check if fully paid now
+        if (amountToPayForThisInvoice >= invoiceRemainingBalance) {
+          await prisma.invoice.update({
+            where: { id: invoice.id },
+            data: {
+              status: "PAID",
+              paidAt: new Date()
+            }
+          });
+        }
       }
+      
+      // TODO: Trigger Email/WhatsApp Receipt here
     }
 
     return NextResponse.json({ status: "ok" });

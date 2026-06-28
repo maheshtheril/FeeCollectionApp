@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 
 export async function POST(req: NextRequest) {
   try {
-    const { invoiceId, invoiceIds } = await req.json();
+    const { invoiceId, invoiceIds, customAmount } = await req.json();
 
     const targetInvoiceIds = invoiceIds ? invoiceIds : (invoiceId ? [invoiceId] : []);
 
@@ -14,6 +14,7 @@ export async function POST(req: NextRequest) {
 
     const invoices = await prisma.invoice.findMany({
       where: { id: { in: targetInvoiceIds } },
+      include: { payments: true }
     });
 
     if (invoices.length !== targetInvoiceIds.length) {
@@ -24,7 +25,25 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "One or more invoices are already paid" }, { status: 400 });
     }
 
-    const totalAmount = invoices.reduce((sum, inv) => sum + inv.amount, 0);
+    // Calculate the remaining balance of all invoices combined
+    const totalRemainingAmount = invoices.reduce((sum, inv) => {
+      const paid = inv.payments.reduce((pSum, p) => pSum + p.amount, 0);
+      return sum + Math.max(0, inv.amount - paid);
+    }, 0);
+
+    const finalAmountToPay = customAmount && customAmount > 0 ? customAmount : totalRemainingAmount;
+
+    // Check if ALL these invoices share the exact same razorpayOrderId (from a previous attempt)
+    // Only re-use if they didn't specify a custom amount that differs.
+    if (!customAmount) {
+      const existingOrderIds = new Set(invoices.map(inv => inv.razorpayOrderId).filter(Boolean));
+      if (existingOrderIds.size === 1) {
+        const allHaveIt = invoices.every(inv => inv.razorpayOrderId === Array.from(existingOrderIds)[0]);
+        if (allHaveIt) {
+           return NextResponse.json({ orderId: Array.from(existingOrderIds)[0], amount: finalAmountToPay });
+        }
+      }
+    }
 
     // Initialize Razorpay
     const razorpay = new Razorpay({
@@ -32,18 +51,9 @@ export async function POST(req: NextRequest) {
       key_secret: process.env.RAZORPAY_KEY_SECRET || "dummy_key_secret",
     });
 
-    // Check if ALL these invoices share the exact same razorpayOrderId (from a previous attempt)
-    const existingOrderIds = new Set(invoices.map(inv => inv.razorpayOrderId).filter(Boolean));
-    if (existingOrderIds.size === 1) {
-      const allHaveIt = invoices.every(inv => inv.razorpayOrderId === Array.from(existingOrderIds)[0]);
-      if (allHaveIt) {
-         return NextResponse.json({ orderId: Array.from(existingOrderIds)[0], amount: totalAmount });
-      }
-    }
-
     // Create a new Razorpay Order (amount is in paise)
     const options = {
-      amount: Math.round(totalAmount * 100),
+      amount: Math.round(finalAmountToPay * 100),
       currency: "INR",
       receipt: invoices.length > 1 ? `bulk_${invoices[0].studentId}` : invoices[0].id,
     };
@@ -60,7 +70,7 @@ export async function POST(req: NextRequest) {
       data: { razorpayOrderId: order.id },
     });
 
-    return NextResponse.json({ orderId: order.id, amount: totalAmount });
+    return NextResponse.json({ orderId: order.id, amount: finalAmountToPay });
   } catch (error: any) {
     console.error("Razorpay Order Error:", error);
     return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });

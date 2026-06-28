@@ -135,10 +135,10 @@ model Student {
   organizationId  String
 
   enrollments     Enrollment[]
-  invoices        Invoice[]
+  invoices    Invoice[]
   
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Enrollment {
@@ -167,9 +167,9 @@ model Invoice {
   id          String   @id @default(cuid())
   amount      Float
   description String
-  status      String   @default("OPEN") // DRAFT, OPEN, PAID, VOID, UNCOLLECTIBLE
+  status      String   @default("OPEN") // DRAFT, OPEN, PAID, OVERDUE, VOID, UNCOLLECTIBLE
   dueDate     DateTime?
-  paidAt      DateTime?
+  paidAt      DateTime? // Date when fully paid
   
   student     Student   @relation(fields: [studentId], references: [id], onDelete: Cascade)
   studentId   String
@@ -178,8 +178,25 @@ model Invoice {
   enrollmentId String?
 
   razorpayOrderId   String?
-  razorpayPaymentId String?
+  
+  payments    PaymentTransaction[]
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
+
+model PaymentTransaction {
+  id            String   @id @default(cuid())
+  amount        Float
+  paymentDate   DateTime @default(now())
+  paymentMethod String   // CASH, CHEQUE, UPI, RAZORPAY
+  reference     String?  // Cheque number, UPI UTR, Razorpay Payment ID
+  notes         String?
+  
+  invoice       Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  invoiceId     String
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+

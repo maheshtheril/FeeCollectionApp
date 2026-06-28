@@ -1,9 +1,9 @@
 import prisma from "@/lib/prisma"
 import { auth } from "@/auth"
 import { redirect } from "next/navigation"
-import { CreditCard } from "lucide-react"
+import { CreditCard, Download } from "lucide-react"
 import { CreatePaymentForm } from "./create-payment-form"
-import { MarkPaidButton } from "./mark-paid-button"
+import { RecordPaymentModal } from "./record-payment-modal"
 import { SendWhatsAppButton } from "./send-whatsapp-button"
 import { RunBillingEngineButton } from "./run-billing-button"
 import Link from "next/link"
@@ -71,7 +71,8 @@ export default async function PaymentsPage({
           student: true,
           course: true 
         }
-      }
+      },
+      payments: true
     },
     orderBy: { createdAt: 'desc' }
   })
@@ -164,16 +165,26 @@ export default async function PaymentsPage({
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right">
                       <div className="flex items-center justify-end gap-3">
+                        {payment.payments && payment.payments.length > 0 && (
+                          <a 
+                            href={`/api/transactions/${payment.payments[payment.payments.length - 1].id}/pdf`}
+                            target="_blank"
+                            title="Download Latest Receipt"
+                            className="p-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-lg transition-colors"
+                          >
+                            <Download size={16} />
+                          </a>
+                        )}
                         {payment.status !== "PAID" && (
                           <SendWhatsAppButton 
                             studentName={payment.enrollment?.student.name || "Student"}
                             courseName={payment.enrollment?.course.name || "Course"}
-                            amount={payment.amount}
+                            amount={payment.amount - (payment.payments?.reduce((s: number, p: any) => s + p.amount, 0) || 0)}
                             phone={payment.enrollment?.student.phone || null}
-                            paymentLink={`/pay/${payment.id}`}
+                            paymentLink={`/pay/student/${payment.studentId}`}
                           />
                         )}
-                        <MarkPaidButton orgSlug={org.slug} paymentId={payment.id} status={payment.status} />
+                        <RecordPaymentModal orgSlug={org.slug} invoice={payment} />
                       </div>
                     </td>
                   </tr>
