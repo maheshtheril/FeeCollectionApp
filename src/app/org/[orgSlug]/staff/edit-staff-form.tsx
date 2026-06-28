@@ -62,7 +62,7 @@ export function EditStaffForm({ orgId, staffMember }: { orgId: string, staffMemb
                 </div>
               )}
               
-              <form id="edit-staff-form" onSubmit={handleSubmit} className="space-y-4">
+              <form id={`edit-staff-form-${staffMember.user.id}`} onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-zinc-400 mb-1">Name</label>
                   <input 
@@ -103,7 +103,7 @@ export function EditStaffForm({ orgId, staffMember }: { orgId: string, staffMemb
             <div className="p-5 border-t border-zinc-800 bg-zinc-900">
               <button 
                 type="submit" 
-                form="edit-staff-form"
+                form={`edit-staff-form-${staffMember.user.id}`}
                 disabled={loading}
                 className="w-full flex items-center justify-center gap-2 py-3 bg-green-500 hover:bg-green-400 disabled:opacity-70 text-black font-bold rounded-xl transition-colors cursor-pointer disabled:cursor-not-allowed"
               >

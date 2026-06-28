@@ -62,7 +62,7 @@ export function EditStudentForm({ orgSlug, student }: { orgSlug: string, student
                 </div>
               )}
               
-              <form id="edit-student-form" onSubmit={handleSubmit} className="space-y-4">
+              <form id={`edit-student-form-${student.id}`} onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-zinc-400 mb-1">Student Name</label>
                   <input 
@@ -103,7 +103,7 @@ export function EditStudentForm({ orgSlug, student }: { orgSlug: string, student
             <div className="p-5 border-t border-zinc-800 bg-zinc-900">
               <button 
                 type="submit" 
-                form="edit-student-form"
+                form={`edit-student-form-${student.id}`}
                 disabled={loading}
                 className="w-full flex items-center justify-center gap-2 py-3 bg-green-500 hover:bg-green-400 disabled:opacity-70 text-black font-bold rounded-xl transition-colors cursor-pointer disabled:cursor-not-allowed"
               >
