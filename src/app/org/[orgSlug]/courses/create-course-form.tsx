@@ -11,6 +11,7 @@ export function CreateCourseForm({ orgSlug, teachers = [] }: { orgSlug: string, 
   const [activeTab, setActiveTab] = useState<'basic' | 'billing'>('basic')
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
+  const [billingInterval, setBillingInterval] = useState("ONCE")
   const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -175,22 +176,38 @@ export function CreateCourseForm({ orgSlug, teachers = [] }: { orgSlug: string, 
                     />
                   </div>
 
-                  <div className="flex gap-3">
-                    <div className="flex-1">
-                      <label className="block text-sm font-medium text-zinc-400 mb-1">Billing Interval</label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-zinc-400 mb-1">Billing Mode</label>
                       <select 
-                        name="billingInterval"
+                        name="billingMode" 
                         className="w-full px-3 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl focus:ring-2 focus:ring-green-500 focus:outline-none text-white transition-shadow appearance-none"
+                        defaultValue="PRE_PAY"
                       >
-                        <option value="ONCE">One-time / Manual</option>
-                        <option value="MONTHLY">Monthly</option>
-                        <option value="QUARTERLY">Quarterly</option>
-                        <option value="HALF_YEARLY">Half Yearly</option>
-                        <option value="YEARLY">Yearly</option>
+                        <option value="PRE_PAY">Pre-pay (Bill in advance)</option>
+                        <option value="POST_PAY">Post-pay (Bill after cycle)</option>
                       </select>
                     </div>
 
-                    <div className="w-1/3">
+                    <div>
+                      <label className="block text-sm font-medium text-zinc-400 mb-1">Billing Interval</label>
+                      <select 
+                        name="billingInterval" 
+                        className="w-full px-3 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl focus:ring-2 focus:ring-green-500 focus:outline-none text-white transition-shadow appearance-none"
+                        value={billingInterval}
+                        onChange={(e) => setBillingInterval(e.target.value)}
+                      >
+                        <option value="ONCE">One-time Fee</option>
+                        <option value="MONTHLY">Monthly</option>
+                        <option value="QUARTERLY">Quarterly</option>
+                        <option value="HALF_YEARLY">Half-Yearly</option>
+                        <option value="YEARLY">Yearly</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {billingInterval !== 'ONCE' && (
+                    <div>
                       <label className="block text-sm font-medium text-zinc-400 mb-1">Anchor Day</label>
                       <input 
                         type="number" 
@@ -201,7 +218,7 @@ export function CreateCourseForm({ orgSlug, teachers = [] }: { orgSlug: string, 
                         className="w-full px-3 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl focus:ring-2 focus:ring-green-500 focus:outline-none text-white transition-shadow"
                       />
                     </div>
-                  </div>
+                  )}
                 </div>
               </form>
             </div>

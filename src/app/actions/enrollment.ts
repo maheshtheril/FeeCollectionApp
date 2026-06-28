@@ -84,8 +84,8 @@ export async function addEnrollmentAction(orgSlug: string, courseId: string, for
       }
     })
 
-    // Create Initial Prorated Invoice if recurring
-    if (course.billingInterval !== "ONCE" && course.baseFeeAmount > 0 && currentPeriodEnd) {
+    // Create Initial Prorated Invoice if recurring AND PRE_PAY
+    if (course.billingInterval !== "ONCE" && course.billingMode !== "POST_PAY" && course.baseFeeAmount > 0 && currentPeriodEnd) {
       const daysRemaining = Math.max(1, Math.ceil((currentPeriodEnd.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)))
       const proratedRatio = Math.min(1, daysRemaining / 30)
       const proratedAmount = Math.round(course.baseFeeAmount * proratedRatio)

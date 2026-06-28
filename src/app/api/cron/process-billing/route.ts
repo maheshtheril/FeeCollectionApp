@@ -35,6 +35,7 @@ export async function GET(request: Request) {
     const enrollmentUpdates: any[] = []
 
     for (const enrollment of enrollmentsToBill) {
+      let currentStartForLoop = enrollment.currentPeriodStart ? new Date(enrollment.currentPeriodStart) : null
       let currentPeriodEndForLoop = new Date(enrollment.currentPeriodEnd || today)
       let periodsCaughtUp = 0
       
@@ -57,21 +58,40 @@ export async function GET(request: Request) {
             break
         }
 
-        // Format the dates for the description
-        const startStr = currentPeriodEndForLoop.toLocaleDateString('en-GB')
-        const endStr = nextEnd.toLocaleDateString('en-GB')
+        let invoiceStartStr = ""
+        let invoiceEndStr = ""
+        let finalAmount = enrollment.course.baseFeeAmount
+
+        if (enrollment.course.billingMode === "POST_PAY") {
+          // Bill for the period that just ended
+          const actualStart = currentStartForLoop || new Date(currentPeriodEndForLoop.getTime() - 30 * 24 * 60 * 60 * 1000)
+          invoiceStartStr = actualStart.toLocaleDateString('en-GB')
+          invoiceEndStr = currentPeriodEndForLoop.toLocaleDateString('en-GB')
+
+          // Prorate if the period was less than 28 days (e.g. partial first month)
+          const daysInPeriod = Math.max(1, Math.ceil((currentPeriodEndForLoop.getTime() - actualStart.getTime()) / (1000 * 60 * 60 * 24)))
+          if (daysInPeriod < 28) {
+            const proratedRatio = Math.min(1, daysInPeriod / 30)
+            finalAmount = Math.round(enrollment.course.baseFeeAmount * proratedRatio)
+          }
+        } else {
+          // PRE_PAY: Bill for the upcoming period
+          invoiceStartStr = currentPeriodEndForLoop.toLocaleDateString('en-GB')
+          invoiceEndStr = nextEnd.toLocaleDateString('en-GB')
+        }
 
         // Prepare new invoice
         invoicesToCreate.push({
           studentId: enrollment.studentId,
           enrollmentId: enrollment.id,
-          amount: enrollment.course.baseFeeAmount,
-          description: `${enrollment.course.billingInterval} Subscription (${startStr} - ${endStr})`,
+          amount: finalAmount,
+          description: `${enrollment.course.billingInterval} Subscription (${invoiceStartStr} - ${invoiceEndStr})`,
           status: "OPEN",
           dueDate: new Date(currentPeriodEndForLoop.getTime() + 7 * 24 * 60 * 60 * 1000), // Due 7 days after period end
         })
 
-        currentPeriodEndForLoop = nextEnd
+        currentStartForLoop = new Date(currentPeriodEndForLoop)
+        currentPeriodEndForLoop = new Date(nextEnd)
         periodsCaughtUp++
       }
 
@@ -80,6 +100,7 @@ export async function GET(request: Request) {
         prisma.enrollment.update({
           where: { id: enrollment.id },
           data: {
+            currentPeriodStart: currentStartForLoop,
             currentPeriodEnd: currentPeriodEndForLoop
           }
         })

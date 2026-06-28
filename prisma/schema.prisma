@@ -105,6 +105,7 @@ model Course {
   customMessageTemplate String?
   
   // Billing Settings (Enterprise-Grade Product)
+  billingMode           String    @default("PRE_PAY") // PRE_PAY, POST_PAY
   billingInterval       String    @default("ONCE") // ONCE, MONTHLY, QUARTERLY, HALF_YEARLY, YEARLY
   baseFeeAmount         Float     @default(0)
   billingAnchorDay      Int       @default(1) // 1-31
