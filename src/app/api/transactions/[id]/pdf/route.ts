@@ -46,6 +46,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       receiptNumber: transaction.id.slice(-6).toUpperCase(),
       paymentDate: transaction.paymentDate.toLocaleDateString('en-GB'),
       orgName: transaction.invoice.enrollment.course.organization.name,
+      logoUrl: transaction.invoice.enrollment.course.organization.logoUrl,
       studentName: transaction.invoice.enrollment.student.name,
       studentPhone: transaction.invoice.enrollment.student.phone,
       paymentMethod: transaction.paymentMethod,

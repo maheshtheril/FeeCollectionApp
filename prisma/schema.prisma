@@ -70,6 +70,7 @@ model Organization {
   id        String   @id @default(cuid())
   name      String
   slug      String   @unique // For URL routing e.g., app.com/org/acme
+  logoUrl   String?
   
   members   OrganizationMember[]
   courses   Course[]

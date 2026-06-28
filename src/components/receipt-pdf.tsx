@@ -1,5 +1,5 @@
 import React from 'react';
-import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
+import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer';
 
 const styles = StyleSheet.create({
   page: {
@@ -10,6 +10,7 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'flex-start',
     marginBottom: 40,
     borderBottom: '1 solid #eee',
     paddingBottom: 20,
@@ -93,7 +94,10 @@ export const ReceiptPDF = ({ data }: { data: any }) => (
           <Text style={styles.value}>Receipt #{data.receiptNumber}</Text>
           <Text style={styles.value}>Date: {data.paymentDate}</Text>
         </View>
-        <View style={{ textAlign: 'right' }}>
+        <View style={{ textAlign: 'right', alignItems: 'flex-end' }}>
+          {data.logoUrl && (
+            <Image src={data.logoUrl} style={{ width: 80, height: 80, objectFit: 'contain', marginBottom: 10 }} />
+          )}
           <Text style={styles.orgName}>{data.orgName}</Text>
         </View>
       </View>

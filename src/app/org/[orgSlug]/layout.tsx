@@ -2,7 +2,7 @@ import { auth } from "@/auth"
 import prisma from "@/lib/prisma"
 import { redirect } from "next/navigation"
 import Link from "next/link"
-import { Users, CreditCard, LayoutDashboard, LogOut } from "lucide-react"
+import { Users, CreditCard, LayoutDashboard, LogOut, Settings } from "lucide-react"
 
 export default async function OrgLayout({
   children,
@@ -64,9 +64,14 @@ export default async function OrgLayout({
             <CreditCard size={20} /> Payments
           </Link>
           {currentOrgMembership.role === "ADMIN" && (
-            <Link href={`/org/${org.slug}/staff`} className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-zinc-900 transition-colors text-zinc-300 hover:text-white">
-              <Users size={20} /> Staff
-            </Link>
+            <>
+              <Link href={`/org/${org.slug}/staff`} className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-zinc-900 transition-colors text-zinc-300 hover:text-white">
+                <Users size={20} /> Staff
+              </Link>
+              <Link href={`/org/${org.slug}/settings`} className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-zinc-900 transition-colors text-zinc-300 hover:text-white">
+                <Settings size={20} /> Settings
+              </Link>
+            </>
           )}
         </nav>
 

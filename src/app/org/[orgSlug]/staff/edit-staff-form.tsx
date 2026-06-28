@@ -97,6 +97,16 @@ export function EditStaffForm({ orgId, staffMember }: { orgId: string, staffMemb
                     <option value="ADMIN">Admin</option>
                   </select>
                 </div>
+                
+                <div className="pt-2 border-t border-zinc-800">
+                  <label className="block text-sm font-medium text-zinc-400 mb-1">New Password (Optional)</label>
+                  <input 
+                    type="password" 
+                    name="password"
+                    placeholder="Leave blank to keep current password" 
+                    className="w-full px-3 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl focus:ring-2 focus:ring-green-500 focus:outline-none text-white transition-shadow"
+                  />
+                </div>
               </form>
             </div>
 

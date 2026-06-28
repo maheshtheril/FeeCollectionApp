@@ -120,23 +120,33 @@ export async function updateStaffAction(orgId: string, targetUserId: string, for
         }
       }
 
+      const userUpdateData: any = { name }
+      
+      if (password && password.trim().length > 0) {
+        if (password.length < 6) throw new Error("Password must be at least 6 characters")
+        userUpdateData.password = await bcrypt.hash(password, 10)
+      }
+
       await tx.user.update({
         where: { id: targetUserId },
-        data: { name }
+        data: userUpdateData
       })
 
       await tx.organizationMember.update({
         where: {
-          organizationId_userId: { organizationId: orgId, userId: targetUserId }
+          organizationId_userId: {
+            organizationId: orgId,
+            userId: targetUserId
+          }
         },
         data: { role }
       })
     })
 
-    revalidatePath(`/org`)
+    revalidatePath(`/org/${orgId}/staff`)
+    revalidatePath(`/orgs`)
     return { success: true }
   } catch (error: any) {
-    console.error("Failed to update staff:", error)
-    return { error: error.message || "Internal Server Error" }
+    return { error: error.message || "Failed to update staff" }
   }
 }
