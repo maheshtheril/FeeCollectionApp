@@ -4,6 +4,7 @@ import { redirect } from "next/navigation"
 import { LayoutDashboard, ChevronRight } from "lucide-react"
 import Link from "next/link"
 import { CreateCourseForm } from "./create-course-form"
+import { EditCourseForm } from "./[courseId]/edit-course-form"
 
 export default async function CoursesPage({
   params
@@ -79,10 +80,9 @@ export default async function CoursesPage({
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {courses.map(course => (
-            <Link 
+            <div 
               key={course.id} 
-              href={`/org/${org.slug}/courses/${course.id}`}
-              className="group p-6 bg-zinc-900 border border-zinc-800 rounded-2xl hover:border-green-500 transition-all transform hover:-translate-y-1 block"
+              className="group p-6 bg-zinc-900 border border-zinc-800 rounded-2xl hover:border-green-500 transition-all flex flex-col"
             >
               <div className="flex justify-between items-start mb-4">
                 <div className="p-3 bg-zinc-950 rounded-xl">
@@ -92,14 +92,19 @@ export default async function CoursesPage({
                   <span className="text-sm font-medium text-zinc-300">{course._count.enrollments} Students</span>
                 </div>
               </div>
-              <h3 className="text-xl font-bold text-white group-hover:text-green-400 transition-colors mb-1">{course.name}</h3>
-              <p className="text-zinc-500 text-sm truncate">UPI: {course.upiId}</p>
+              <h3 className="text-xl font-bold text-white mb-1">{course.name}</h3>
+              <p className="text-zinc-500 text-sm truncate mb-4">UPI: {course.upiId}</p>
               
-              <div className="mt-6 pt-4 border-t border-zinc-800 flex items-center justify-between text-sm text-zinc-400 group-hover:text-white transition-colors">
-                <span>View Details</span>
-                <ChevronRight size={16} />
+              <div className="mt-auto pt-4 border-t border-zinc-800 flex items-center justify-between">
+                <Link href={`/org/${org.slug}/courses/${course.id}`} className="text-sm font-semibold text-zinc-400 hover:text-white flex items-center gap-1 transition-colors">
+                  View Details <ChevronRight size={16} />
+                </Link>
+                
+                {!isTeacher && (
+                  <EditCourseForm orgSlug={org.slug} course={course} teachers={teachers} />
+                )}
               </div>
-            </Link>
+            </div>
           ))}
         </div>
       )}

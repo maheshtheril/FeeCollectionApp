@@ -100,7 +100,7 @@ export function EditCourseForm({
                 </button>
               </div>
 
-              <form id="edit-course-form" onSubmit={handleSubmit} className="space-y-4">
+              <form id={`edit-course-form-${course.id}`} onSubmit={handleSubmit} className="space-y-4">
                 {/* Basic Info Tab */}
                 <div className={activeTab === 'basic' ? 'block space-y-4 animate-fade-in' : 'hidden'}>
                   <div>
@@ -228,7 +228,7 @@ export function EditCourseForm({
             <div className="p-5 border-t border-zinc-800 shrink-0">
               <button 
                 type="submit" 
-                form="edit-course-form"
+                form={`edit-course-form-${course.id}`}
                 disabled={loading}
                 className="w-full flex items-center justify-center gap-2 py-3 bg-green-500 hover:bg-green-400 disabled:opacity-70 text-black font-bold rounded-xl transition-colors cursor-pointer disabled:cursor-not-allowed"
               >
