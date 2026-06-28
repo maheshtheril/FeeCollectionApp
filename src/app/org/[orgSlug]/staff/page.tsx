@@ -68,7 +68,7 @@ export default async function StaffPage({ params }: { params: Promise<{ orgSlug:
                     {member.role}
                   </span>
                 </td>
-                <td className="px-6 py-4">{new Date(member.createdAt).toLocaleDateString()}</td>
+                <td className="px-6 py-4">{new Date(member.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</td>
                 <td className="px-6 py-4 text-right">
                   <EditStaffForm orgId={organization.id} staffMember={member} />
                 </td>
