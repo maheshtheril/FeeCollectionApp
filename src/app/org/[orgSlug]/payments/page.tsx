@@ -4,6 +4,7 @@ import { redirect } from "next/navigation"
 import { CreditCard } from "lucide-react"
 import { CreatePaymentForm } from "./create-payment-form"
 import { MarkPaidButton } from "./mark-paid-button"
+import { SendWhatsAppButton } from "./send-whatsapp-button"
 import Link from "next/link"
 
 function getRelativeDaysText(dueDate: Date) {
@@ -156,7 +157,18 @@ export default async function PaymentsPage({
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right">
-                      <MarkPaidButton orgSlug={org.slug} paymentId={payment.id} status={payment.status} />
+                      <div className="flex items-center justify-end gap-3">
+                        {payment.status !== "PAID" && (
+                          <SendWhatsAppButton 
+                            studentName={payment.enrollment?.student.name || "Student"}
+                            courseName={payment.enrollment?.course.name || "Course"}
+                            amount={payment.amount}
+                            phone={payment.enrollment?.student.phone || null}
+                            paymentLink={`/pay/${payment.id}`}
+                          />
+                        )}
+                        <MarkPaidButton orgSlug={org.slug} paymentId={payment.id} status={payment.status} />
+                      </div>
                     </td>
                   </tr>
                 ))}
