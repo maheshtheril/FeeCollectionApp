@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Toaster } from "sonner";
+import NextTopLoader from 'nextjs-toploader';
 
 export const metadata: Metadata = {
   title: "FeeFlow - Fee Collection App",
@@ -15,6 +16,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+        <NextTopLoader color="#22c55e" showSpinner={false} />
         <div className="min-h-screen bg-black antialiased selection:bg-green-500/30">
           {children}
         </div>
