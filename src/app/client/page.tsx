@@ -163,13 +163,29 @@ export default function ClientApp() {
                   </div>
                   
                   {payment.status === 'OPEN' || payment.status === 'OVERDUE' ? (
-                    <a 
-                      href={generateUpiLink(payment)}
-                      className="btn"
-                      style={{ width: '100%', textDecoration: 'none' }}
-                    >
-                      Pay Now with UPI
-                    </a>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      <a 
+                        href={generateUpiLink(payment)}
+                        className="btn"
+                        style={{ width: '100%', textDecoration: 'none' }}
+                      >
+                        Pay Now with UPI App
+                      </a>
+                      <details style={{ width: '100%' }}>
+                        <summary className="btn" style={{ backgroundColor: 'var(--background)', color: 'var(--foreground)', cursor: 'pointer', textAlign: 'center', padding: '12px', borderRadius: '12px', display: 'block' }}>
+                          Show QR Code to Scan
+                        </summary>
+                        <div style={{ marginTop: '8px', padding: '16px', backgroundColor: '#fff', borderRadius: '12px', textAlign: 'center' }}>
+                          <h4 style={{ color: '#000', fontWeight: 'bold', marginBottom: '12px' }}>Scan with any UPI App</h4>
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img 
+                            src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(generateUpiLink(payment))}`}
+                            alt="UPI QR Code"
+                            style={{ margin: '0 auto', width: '200px', height: '200px' }}
+                          />
+                        </div>
+                      </details>
+                    </div>
                   ) : (
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: '#1db954', padding: '14px', backgroundColor: 'rgba(29, 185, 84, 0.1)', borderRadius: '12px', fontWeight: 'bold' }}>
                       <CheckCircle size={20} /> Payment Successful
