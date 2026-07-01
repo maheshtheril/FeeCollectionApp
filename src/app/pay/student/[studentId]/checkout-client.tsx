@@ -8,7 +8,6 @@ export function CheckoutClient({ invoiceIds, totalAmount, upiId, orgName }: { in
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [amountToPay, setAmountToPay] = useState<number>(totalAmount)
-  const [showQR, setShowQR] = useState(false)
 
   const handlePayment = async () => {
     if (amountToPay <= 0 || amountToPay > totalAmount) {
@@ -62,16 +61,7 @@ export function CheckoutClient({ invoiceIds, totalAmount, upiId, orgName }: { in
     }
   }
 
-  const handleUpiPayment = () => {
-    if (amountToPay <= 0 || amountToPay > totalAmount) {
-      setError("Please enter a valid amount to pay")
-      return
-    }
-    if (!upiId) return;
-    const tr = `TXN${Date.now()}`;
-    const upiUri = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(orgName || "Fee Payment")}&mc=0000&tr=${tr}&am=${amountToPay.toFixed(2)}&cu=INR&tn=Fee_Payment`;
-    window.location.href = upiUri;
-  }
+
 
   return (
     <>
@@ -102,33 +92,19 @@ export function CheckoutClient({ invoiceIds, totalAmount, upiId, orgName }: { in
       
       
       {upiId && (
-        <div className="flex flex-col gap-2 mb-3">
-          <button 
-            onClick={handleUpiPayment}
-            className="w-full py-4 bg-indigo-500 hover:bg-indigo-400 text-white font-bold rounded-xl transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-[0_0_15px_rgba(99,102,241,0.3)] hover:shadow-[0_0_25px_rgba(99,102,241,0.5)]"
-          >
-            Open UPI App (GPay, PhonePe)
-          </button>
-          
-          <button 
-            onClick={() => setShowQR(!showQR)}
-            className="w-full py-3 flex items-center justify-center gap-2 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-white font-bold rounded-xl transition-all"
-          >
-            <QrCode size={18} /> {showQR ? "Hide QR Code" : "Show QR Code to Scan"}
-          </button>
-
-          {showQR && (
-            <div className="mt-2 p-6 bg-white rounded-2xl flex flex-col items-center justify-center animate-fade-in shadow-xl">
-              <h3 className="text-black font-bold mb-4 text-center">Scan with any UPI App</h3>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img 
-                src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(`upi://pay?pa=${upiId}&pn=${orgName || "Fee Payment"}&mc=0000&tr=TXN${Date.now()}&am=${amountToPay.toFixed(2)}&cu=INR&tn=Fee_Payment`)}`} 
-                alt="UPI QR Code"
-                className="w-48 h-48"
-              />
-              <p className="text-zinc-500 text-sm mt-4 font-medium text-center">Amount: ₹{amountToPay.toFixed(2)}</p>
-            </div>
-          )}
+        <div className="mb-4 p-6 bg-white border border-zinc-200 rounded-2xl flex flex-col items-center justify-center shadow-sm">
+          <div className="flex items-center gap-2 mb-4 text-black font-bold">
+            <QrCode size={20} className="text-green-600" />
+            <h3>Scan to Pay via UPI</h3>
+          </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img 
+            src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(`upi://pay?pa=${upiId}&pn=${orgName || "Fee Payment"}&mc=0000&tr=TXN${Date.now()}&am=${amountToPay.toFixed(2)}&cu=INR&tn=Fee_Payment`)}`} 
+            alt="UPI QR Code"
+            className="w-48 h-48 border border-zinc-100 p-2 rounded-xl"
+          />
+          <p className="text-zinc-600 font-medium mt-4 text-center">Amount: ₹{amountToPay.toFixed(2)}</p>
+          <p className="text-zinc-400 text-xs mt-1 text-center">Use GPay, PhonePe, Paytm, or any UPI App</p>
         </div>
       )}
 
