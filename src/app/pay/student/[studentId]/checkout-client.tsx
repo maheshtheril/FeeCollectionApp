@@ -66,7 +66,8 @@ export function CheckoutClient({ invoiceIds, totalAmount, upiId, orgName }: { in
       return
     }
     if (!upiId) return;
-    const upiUri = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(orgName || "Fee Payment")}&am=${amountToPay.toFixed(2)}&cu=INR&tn=Fee_Payment`;
+    const tr = `TXN${Date.now()}`;
+    const upiUri = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(orgName || "Fee Payment")}&mc=0000&tr=${tr}&am=${amountToPay.toFixed(2)}&cu=INR&tn=Fee_Payment`;
     window.location.href = upiUri;
   }
 
