@@ -49,8 +49,12 @@ export default async function OrgLayout({
       {/* Sidebar (Desktop Only) */}
       <aside className="hidden md:flex w-64 bg-zinc-950 border-r border-zinc-900 flex-col">
         <div className="p-6 border-b border-zinc-900">
-          <h2 className="text-xl font-bold tracking-tight">{org.name}</h2>
-          <span className="text-xs text-zinc-500 uppercase tracking-wider">{currentOrgMembership.role}</span>
+          <div className="flex items-center gap-3 mb-2">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo.png" alt="FeeFlow" className="w-8 h-8 object-contain" />
+            <h2 className="text-xl font-bold tracking-tight">{org.name}</h2>
+          </div>
+          <span className="text-xs text-zinc-500 uppercase tracking-wider block">{currentOrgMembership.role}</span>
         </div>
         
         <nav className="flex-1 p-4 space-y-2">

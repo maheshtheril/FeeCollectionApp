@@ -49,11 +49,9 @@ function LoginForm() {
         <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 via-transparent to-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
         
         <div className="text-center space-y-3">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-green-400 to-green-600 shadow-lg shadow-green-500/30 mb-2 transform transition hover:scale-105 duration-300">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-black" viewBox="0 0 20 20" fill="currentColor">
-              <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z" />
-              <path fillRule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clipRule="evenodd" />
-            </svg>
+          <div className="inline-flex items-center justify-center w-24 h-24 mb-2 transform transition hover:scale-105 duration-300">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo.png" alt="FeeFlow Logo" className="w-full h-full object-contain drop-shadow-[0_0_15px_rgba(34,197,94,0.3)]" />
           </div>
           <h1 className="text-4xl font-extrabold tracking-tight text-white">Welcome back</h1>
           <p className="text-sm font-medium text-zinc-400">Enter your details to access your account</p>

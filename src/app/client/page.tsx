@@ -74,8 +74,8 @@ export default function ClientApp() {
   return (
     <div className="animate-fade-in" style={{ padding: '24px 16px', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <div style={{ textAlign: 'center', marginBottom: '40px', marginTop: '20px' }}>
-        <h1 style={{ fontSize: '28px', fontWeight: '800', color: '#1db954' }}>FeeFlow</h1>
-        <p style={{ color: '#a0a0a0', fontSize: '14px', marginTop: '8px' }}>Secure Fee Payments</p>
+        <img src="/logo.png" alt="FeeFlow Logo" style={{ height: '48px', margin: '0 auto' }} />
+        <p style={{ color: '#a0a0a0', fontSize: '14px', marginTop: '12px' }}>Secure Fee Payments</p>
       </div>
 
       {step === 1 && (
