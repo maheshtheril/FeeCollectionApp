@@ -158,11 +158,17 @@ export function AddEnrollmentForm({
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-zinc-400 mb-1">Start Date</label>
+                  <label className="block text-sm font-medium text-zinc-400 mb-1">Start Date (dd/MM/yyyy)</label>
                   <input 
-                    type="date" 
+                    type="text" 
                     name="startDate"
-                    defaultValue={new Date().toISOString().split('T')[0]}
+                    placeholder="dd/MM/yyyy"
+                    pattern="\d{2}/\d{2}/\d{4}"
+                    title="Please enter date in dd/MM/yyyy format"
+                    defaultValue={(() => {
+                      const today = new Date();
+                      return `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(2, '0')}/${today.getFullYear()}`;
+                    })()}
                     required
                     className="w-full px-3 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl focus:ring-2 focus:ring-green-500 focus:outline-none text-white transition-shadow"
                   />

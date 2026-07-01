@@ -53,10 +53,14 @@ export async function addEnrollmentAction(orgSlug: string, courseId: string, for
       return { error: "Student is already enrolled in this course" }
     }
 
-    // Parse the start date if provided, otherwise default to today
     let today = new Date()
     if (validated.data.startDate) {
-      const parsedDate = new Date(validated.data.startDate)
+      let dateString = validated.data.startDate;
+      if (dateString.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+        const [day, month, year] = dateString.split('/');
+        dateString = `${year}-${month}-${day}`;
+      }
+      const parsedDate = new Date(dateString)
       if (!isNaN(parsedDate.getTime())) {
         today = parsedDate
       }
@@ -115,8 +119,13 @@ export async function editEnrollmentAction(orgSlug: string, enrollmentId: string
   const session = await auth()
   if (!session?.user?.id) return { error: "Unauthorized" }
 
-  const startDateStr = formData.get("startDate") as string
+  let startDateStr = formData.get("startDate") as string
   if (!startDateStr) return { error: "Start date is required" }
+
+  if (startDateStr.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+    const [day, month, year] = startDateStr.split('/');
+    startDateStr = `${year}-${month}-${day}`;
+  }
 
   const parsedDate = new Date(startDateStr)
   if (isNaN(parsedDate.getTime())) return { error: "Invalid date" }

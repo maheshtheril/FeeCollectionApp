@@ -67,7 +67,7 @@ export default function ClientApp() {
   };
 
   const generateUpiLink = (payment: Invoice) => {
-    return `upi://pay?pa=${payment.upiId}&pn=${encodeURIComponent(payment.courseName)}&am=${payment.amount}&cu=INR&tn=${encodeURIComponent(payment.description)}`;
+    return `upi://pay?pa=${payment.upiId}&pn=${encodeURIComponent(payment.courseName)}&am=${payment.amount.toFixed(2)}&cu=INR&tn=${encodeURIComponent(payment.description)}`;
   };
 
   return (
